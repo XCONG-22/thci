@@ -30,6 +30,16 @@ npm run dev
 
 截图请放在 `typography-grid-detector/public/presentation-assets/`，文件名与 HTML 中引用一致。
 
+### 在线打开同一套演示稿（GitHub Pages）
+
+仓库中的 **`docs/`** 目录放的是同一 HTML 幻灯，用于在 **GitHub 网站** 上直接浏览（无需运行 Node）。
+
+1. 打开 GitHub 仓库 **Settings → Pages**。  
+2. **Build and deployment**：Source 选 **Deploy from a branch**，Branch 选 **`main`**，文件夹选 **`/docs`**，保存。  
+3. 等待一两分钟后访问：**https://xcong-22.github.io/thci/**（或同一地址下的 `Typography-Grid-Analyzer-Deck-Screenshots.html`）。
+
+若幻灯里图片空白，请将 PNG 截图提交到 **`docs/presentation-assets/`**（文件名见该目录内说明）。
+
 ### 其它目录
 
 - `presentation/`：演示文稿 HTML / 大纲（可单独下载浏览）
