@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>研究方向陈述｜AI×艺术疗愈与睡眠健康视觉传达</title>
+    <style>
+      :root{
+        --bg: #fbfbfa;
+        --paper: #ffffff;
+        --text: #111214;
+        --muted: #5a5f69;
+        --line: rgba(17,18,20,0.10);
+        --line-2: rgba(17,18,20,0.06);
+        --accent: #1e3a8a;
+        --shadow: 0 16px 40px rgba(17,18,20,0.06);
+        color-scheme: light;
+      }
+      *{ box-sizing: border-box; }
+      html, body { height: 100%; }
+      body{
+        margin: 0;
+        background: radial-gradient(1200px 700px at 20% 0%, rgba(30,58,138,0.06), transparent 55%),
+                    radial-gradient(900px 600px at 85% 20%, rgba(14,116,144,0.06), transparent 60%),
+                    var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 15px;
+        line-height: 1.75;
+        letter-spacing: 0.01em;
+      }
+      a{ color: inherit; text-decoration: none; }
+      .wrap{
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: 34px 18px 80px;
+      }
+      header{
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 18px;
+        padding: 22px 22px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.72);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+      @media (max-width: 860px){
+        header{ grid-template-columns: 1fr; }
+      }
+      .title{
+        margin: 0;
+        font-size: 18px;
+        font-weight: 650;
+        letter-spacing: 0.02em;
+      }
+      .subtitle{
+        margin: 6px 0 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .meta{
+        border-left: 1px solid var(--line-2);
+        padding-left: 18px;
+        display: grid;
+        gap: 8px;
+        align-content: start;
+      }
+      @media (max-width: 860px){
+        .meta{ border-left: none; padding-left: 0; border-top: 1px solid var(--line-2); padding-top: 14px; }
+      }
+      .chip{
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 6px 10px;
+        border: 1px solid var(--line-2);
+        background: rgba(255,255,255,0.70);
+        border-radius: 999px;
+        font-size: 12px;
+        color: var(--muted);
+        width: fit-content;
+      }
+      .dot{
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--accent);
+        opacity: 0.85;
+      }
+      nav{
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 12px;
+        padding: 12px 2px 0;
+      }
+      .navlink{
+        font-size: 12px;
+        color: var(--muted);
+        padding: 6px 10px;
+        border: 1px solid var(--line-2);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.55);
+      }
+      .navlink:hover{ border-color: var(--line); }
+      main{ margin-top: 26px; }
+      section{
+        margin-top: 18px;
+        border: 1px solid var(--line);
+        background: var(--paper);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+      .sec-hd{
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--line-2);
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .sec-hd h2{
+        margin: 0;
+        font-size: 14px;
+        font-weight: 650;
+        letter-spacing: 0.04em;
+      }
+      .sec-hd .hint{
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .sec-bd{ padding: 16px 18px 18px; }
+      .grid2{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      @media (max-width: 900px){
+        .grid2{ grid-template-columns: 1fr; }
+      }
+      .box{
+        border: 1px solid var(--line-2);
+        border-radius: 14px;
+        padding: 14px 14px;
+        background: linear-gradient(180deg, rgba(30,58,138,0.03), transparent 55%);
+      }
+      .k{ font-weight: 650; }
+      ul{ margin: 10px 0 0 18px; padding: 0; }
+      li{ margin: 6px 0; }
+      .statement{
+        margin: 0;
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.85;
+      }
+      .muted{ color: var(--muted); }
+      .divider{
+        height: 1px;
+        background: var(--line-2);
+        margin: 14px 0;
+      }
+      footer{
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 8px 2px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <p class="chip"><span class="dot"></span>研究方向陈述（拟）</p>
+          <h1 class="title">生成式AI驱动的艺术疗愈内容生成与睡眠健康视觉传达设计研究</h1>
+          <p class="subtitle">面向年轻人及中年人：以睡眠数据与情绪状态为依据的个性化、低负荷、可验证的非药物干预界面探索</p>
+          <nav aria-label="页面导航">
+            <a class="navlink" href="#statement">陈述</a>
+            <a class="navlink" href="#background">问题与背景</a>
+            <a class="navlink" href="#aims">目标与研究问题</a>
+            <a class="navlink" href="#method">方法与技术路线</a>
+            <a class="navlink" href="#innovation">预期创新</a>
+            <a class="navlink" href="#deliverables">预期产出</a>
+            <a class="navlink" href="#plan">进度与验证</a>
+          </nav>
+        </div>
+        <div class="meta">
+          <div class="chip"><span class="dot" style="background:#0e7490"></span>研究领域：健康视觉传达 / 交互设计 / 生成式AI</div>
+          <div class="chip"><span class="dot" style="background:#7c3aed"></span>应用场景：睡前放松｜夜间温和唤醒｜晨间情绪重置</div>
+          <div class="chip"><span class="dot" style="background:#b45309"></span>核心方法：个性化生成 + 沉浸交互 + 用户研究与评估</div>
+          <div class="chip"><span class="dot" style="background:#14532d"></span>关键词：艺术疗愈｜睡眠健康｜非药物干预｜可用性｜情感共鸣</div>
+        </div>
+      </header>
+
+      <main>
+        <section id="statement">
+          <div class="sec-hd">
+            <h2>研究陈述（300–400字）</h2>
+            <p class="hint">以导师阅读为导向的凝练版</p>
+          </div>
+          <div class="sec-bd">
+            <p class="statement">
+              本研究聚焦年轻人与中年人睡眠质量下降及伴随的情绪困扰，面向“非药物、可持续、自我调节”的健康需求，探索生成式AI与艺术疗愈在健康视觉传达设计中的可行路径。研究以睡眠数据（节律、时长、觉醒等）与情绪自评为输入，建立参数可追溯的内容生成机制，生成动态自然景观、抽象疗愈图案与柔和渐变等低刺激视觉内容，并将其嵌入睡前放松引导、夜间温和唤醒与晨间情绪重置的交互流程。设计层面重点优化夜间可读性、信息层级、色彩情绪一致性与审美统一，形成分龄差异化的界面策略（年轻人强调沉浸与个性表达，中年人强调可读与确定反馈）。最终通过原型系统与用户测试，从可用性、主观放松度/唤醒度与睡眠相关自评等维度验证个性化AI艺术疗愈的干预价值，为健康视觉传达提供方法框架与证据支持。
+            </p>
+            <div class="divider"></div>
+            <p class="muted" style="margin:0;font-size:12px;">
+              备注：正文刻意避免“概念化修辞”，强调可解释生成、夜间使用约束与可验证性，以符合导师审阅习惯。
+            </p>
+          </div>
+        </section>
+
+        <section id="background">
+          <div class="sec-hd">
+            <h2>问题与背景</h2>
+            <p class="hint">为何值得做｜设计与证据缺口</p>
+          </div>
+          <div class="sec-bd grid2">
+            <div class="box">
+              <div class="k">现实问题</div>
+              <ul>
+                <li>睡眠问题常伴随焦虑、压力与情绪波动，需求具有高频与长期性。</li>
+                <li>数字化助眠产品“同质化内容”明显，个体差异与情境变化难以覆盖。</li>
+                <li>夜间使用对亮度、闪烁、动效节奏更敏感，稍有不当就会反向刺激。</li>
+              </ul>
+            </div>
+            <div class="box">
+              <div class="k">研究缺口（设计视角）</div>
+              <ul>
+                <li>艺术疗愈的“情感价值”常被描述，却缺少面向界面的可操作设计变量。</li>
+                <li>生成式AI用于助眠多停留在“内容生成”，对交互流程与信息架构关注不足。</li>
+                <li>缺乏把“个性化生成”转化为可验证体验收益的评估框架。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="aims">
+          <div class="sec-hd">
+            <h2>研究目标与研究问题</h2>
+            <p class="hint">明确边界｜可回答</p>
+          </div>
+          <div class="sec-bd grid2">
+            <div class="box">
+              <div class="k">目标</div>
+              <ul>
+                <li>构建“数据/情绪 → 生成内容 → 交互流程 → 体验与指标”的设计框架。</li>
+                <li>提出分龄视觉与交互策略，形成可复用的界面规范与内容库结构。</li>
+                <li>以原型与用户研究验证个性化生成对放松与睡眠体验的增益。</li>
+              </ul>
+            </div>
+            <div class="box">
+              <div class="k">研究问题</div>
+              <ul>
+                <li>睡眠数据与情绪状态应如何映射为低刺激、可解释的视觉参数？</li>
+                <li>夜间界面如何在“疗愈美学—可读性—交互负荷”之间取得稳定平衡？</li>
+                <li>个性化生成在何种条件下显著优于通用内容？其证据如何建立？</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="method">
+          <div class="sec-hd">
+            <h2>方法与技术路线（概要）</h2>
+            <p class="hint">从内容到界面再到验证</p>
+          </div>
+          <div class="sec-bd">
+            <div class="grid2">
+              <div class="box">
+                <div class="k">A. 内容生成（可解释约束）</div>
+                <ul>
+                  <li>输入：节律/觉醒/时长等睡眠特征 + 情绪自评 + 个体偏好（色系/动感/明暗）。</li>
+                  <li>输出：动态自然景观、抽象图案、柔和渐变等多模态视觉内容。</li>
+                  <li>约束：低亮度、低闪烁、低频动效；参数—视觉变化可追溯，便于迭代与研究。</li>
+                </ul>
+              </div>
+              <div class="box">
+                <div class="k">B. 交互与视觉传达（分龄策略）</div>
+                <ul>
+                  <li>流程：睡前放松引导 → 夜间温和唤醒 → 晨间情绪重置。</li>
+                  <li>视觉：信息层级与对比控制、字体可读、色彩情绪一致、动效节奏克制。</li>
+                  <li>分龄：年轻人偏沉浸与自我表达；中年人偏“清晰、可控、低负荷”。</li>
+                </ul>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="box">
+              <div class="k">C. 评估与验证（面向证据）</div>
+              <ul>
+                <li>可用性：任务完成、错误率、主观负荷（如 NASA-TLX 或简化量表）。</li>
+                <li>情绪体验：放松度/唤醒度、情绪稳定性自评，必要时加访谈获取机制解释。</li>
+                <li>睡眠体验：入睡容易度、夜间觉醒感受、醒后恢复感等自评；可加入可穿戴数据作为辅助证据。</li>
+                <li>对照：通用内容 vs 个性化生成；不同视觉风格/动效节奏的设计对照。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="innovation">
+          <div class="sec-hd">
+            <h2>预期创新点</h2>
+            <p class="hint">设计贡献与研究贡献</p>
+          </div>
+          <div class="sec-bd grid2">
+            <div class="box">
+              <div class="k">设计层面</div>
+              <ul>
+                <li>将艺术疗愈转译为可操作的视觉变量与界面规范（亮度、对比、频率、节奏、层级）。</li>
+                <li>提出分龄交互策略与夜间使用约束的系统化方法。</li>
+              </ul>
+            </div>
+            <div class="box">
+              <div class="k">研究层面</div>
+              <ul>
+                <li>构建“个性化生成—体验收益”的评估框架与对照实验路径。</li>
+                <li>强调可解释生成（可追溯参数）以支持迭代与学术论证。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="deliverables">
+          <div class="sec-hd">
+            <h2>预期产出</h2>
+            <p class="hint">导师最关心的可交付</p>
+          </div>
+          <div class="sec-bd grid2">
+            <div class="box">
+              <div class="k">设计产出</div>
+              <ul>
+                <li>可交互原型（核心流程 + 个性化生成展示）。</li>
+                <li>视觉语言与组件规范（夜间可读/动效节奏/色彩情绪）。</li>
+                <li>疗愈内容库与生成参数模板（可复用、可迭代）。</li>
+              </ul>
+            </div>
+            <div class="box">
+              <div class="k">研究产出</div>
+              <ul>
+                <li>研究框架与方法论总结（适用于健康视觉传达语境）。</li>
+                <li>用户研究与验证报告（指标、对照、结论与局限）。</li>
+                <li>可推广设计建议（面向同类非药物睡眠干预产品）。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="plan">
+          <div class="sec-hd">
+            <h2>进度与验证计划（建议）</h2>
+            <p class="hint">可按学期周次调整</p>
+          </div>
+          <div class="sec-bd">
+            <div class="box">
+              <ul>
+                <li><span class="k">阶段1（调研）</span>：睡眠健康与艺术疗愈相关文献梳理；竞品与夜间界面规范分析；访谈提炼需求。</li>
+                <li><span class="k">阶段2（框架）</span>：确定数据/情绪特征与视觉参数映射；定义内容生成约束与风格边界；信息架构与交互流程草案。</li>
+                <li><span class="k">阶段3（原型）</span>：完成关键界面与交互原型；形成视觉组件与动效节奏规范；制作多方案对照版本。</li>
+                <li><span class="k">阶段4（测试）</span>：可用性测试 + 体验量表 + 半结构访谈；必要时增加短周期日记研究。</li>
+                <li><span class="k">阶段5（总结）</span>：迭代收敛设计；完成论文/说明书与成果展示页面。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <footer></footer>
+      </main>
+    </div>
+  </body>
+</html>
