@@ -1,0 +1,380 @@
+:root {
+  --bg-0: #040b0b;
+  --bg-1: #061517;
+  --bio-cyan: #84fff5;
+  --bio-green: #63f0a4;
+  --bio-blue: #4bc9ff;
+  --mist: rgba(170, 255, 237, 0.2);
+  --glass: rgba(14, 38, 39, 0.35);
+  --glass-border: rgba(149, 255, 231, 0.24);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(58, 181, 164, 0.16), transparent 40%),
+    radial-gradient(circle at 78% 16%, rgba(82, 179, 255, 0.14), transparent 45%),
+    linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 100%);
+  color: #defef3;
+  font-family: "Manrope", sans-serif;
+  overflow-x: hidden;
+}
+
+#eco-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.fog-layer,
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.fog-layer {
+  z-index: 1;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(118, 255, 214, 0.12), transparent 40%),
+    radial-gradient(circle at 70% 70%, rgba(69, 200, 255, 0.1), transparent 42%);
+  filter: blur(24px);
+  animation: fog-drift 22s ease-in-out infinite alternate;
+}
+
+.vignette {
+  z-index: 2;
+  background: radial-gradient(circle at center, transparent 45%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+.hero,
+main {
+  position: relative;
+  z-index: 3;
+}
+
+.hero {
+  min-height: 90vh;
+  display: grid;
+  place-content: center;
+  gap: 1rem;
+  padding: 8vh 8vw 3vh;
+}
+
+.tag {
+  margin: 0;
+  color: rgba(181, 255, 237, 0.8);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+h1 {
+  margin: 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(3.4rem, 9vw, 8rem);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 28px rgba(103, 255, 222, 0.3);
+}
+
+.lead {
+  margin: 0;
+  max-width: 58ch;
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  color: rgba(222, 254, 243, 0.9);
+  line-height: 1.8;
+}
+
+.glass-button {
+  width: fit-content;
+  margin-top: 0.6rem;
+  border: 1px solid rgba(128, 247, 214, 0.48);
+  background: linear-gradient(160deg, rgba(50, 142, 121, 0.25), rgba(50, 133, 156, 0.18));
+  color: #e8fff6;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: transform 0.4s ease, background 0.5s ease, box-shadow 0.5s ease;
+}
+
+.glass-button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(160deg, rgba(74, 170, 150, 0.32), rgba(66, 180, 207, 0.25));
+  box-shadow: 0 0 20px rgba(121, 250, 224, 0.22);
+}
+
+main {
+  width: min(1060px, 92vw);
+  margin: 0 auto;
+  padding-bottom: 12vh;
+}
+
+.glass-panel {
+  background: linear-gradient(170deg, rgba(19, 52, 50, 0.39), rgba(14, 42, 59, 0.22));
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  border-radius: 28px;
+  padding: clamp(1rem, 3vw, 2rem);
+  margin: 0 0 2rem;
+  box-shadow: inset 0 0 40px rgba(115, 255, 221, 0.07);
+}
+
+.glass-panel h2 {
+  margin-top: 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+  color: #defff6;
+}
+
+.glass-panel p {
+  line-height: 1.8;
+  color: rgba(218, 255, 244, 0.93);
+}
+
+.split {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: center;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+
+.metrics article {
+  border-radius: 18px;
+  background: rgba(98, 235, 202, 0.07);
+  border: 1px solid rgba(133, 246, 227, 0.2);
+  padding: 0.9rem;
+}
+
+.metrics span {
+  display: block;
+  font-size: 0.78rem;
+  opacity: 0.8;
+  margin-bottom: 0.4rem;
+}
+
+.metrics strong {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--bio-cyan);
+}
+
+.hint {
+  opacity: 0.75;
+  font-size: 0.85rem;
+}
+
+.orbital {
+  width: min(240px, 60vw);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(87, 255, 214, 0.2), rgba(16, 51, 56, 0.08) 65%, transparent 100%);
+}
+
+.core,
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  inset: 0;
+  margin: auto;
+}
+
+.core {
+  width: 36%;
+  height: 36%;
+  background: radial-gradient(circle, rgba(135, 255, 230, 0.9), rgba(58, 190, 167, 0.2));
+  box-shadow: 0 0 28px rgba(108, 255, 214, 0.45);
+  animation: pulse 7s ease-in-out infinite;
+}
+
+.ring {
+  border: 1px solid rgba(126, 255, 228, 0.35);
+}
+
+.ring-a {
+  width: 62%;
+  height: 62%;
+  animation: spin 18s linear infinite;
+}
+
+.ring-b {
+  width: 88%;
+  height: 88%;
+  animation: spin 26s linear infinite reverse;
+}
+
+.growth-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.8rem;
+}
+
+.growth-grid article {
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(118, 255, 205, 0.12), transparent 55%),
+    rgba(43, 101, 96, 0.15);
+  border: 1px solid rgba(141, 255, 223, 0.2);
+  padding: 0.9rem;
+  transition: transform 0.6s ease;
+}
+
+.growth-grid article:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+.growth-grid h3 {
+  margin: 0 0 0.6rem;
+  font-weight: 500;
+}
+
+.liquid-meter {
+  position: relative;
+  width: min(220px, 58vw);
+  height: 220px;
+  border-radius: 42% 58% 60% 40% / 52% 40% 60% 48%;
+  border: 1px solid rgba(136, 243, 220, 0.35);
+  overflow: hidden;
+  background: rgba(27, 78, 72, 0.24);
+  margin-inline: auto;
+}
+
+.liquid-fill {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 60%;
+  background: linear-gradient(180deg, rgba(99, 227, 255, 0.78), rgba(79, 239, 180, 0.44));
+  filter: blur(0.3px);
+  animation: liquid 9s ease-in-out infinite;
+}
+
+.breath-quote {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  letter-spacing: 0.01em;
+}
+
+.breath-wave {
+  margin-top: 0.8rem;
+  height: 68px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 10% 50%, rgba(113, 255, 222, 0.55), transparent 12%),
+    radial-gradient(circle at 40% 50%, rgba(113, 255, 222, 0.4), transparent 14%),
+    radial-gradient(circle at 70% 50%, rgba(113, 255, 222, 0.55), transparent 13%),
+    rgba(33, 84, 89, 0.26);
+  animation: wave-breath 10s ease-in-out infinite;
+}
+
+.node-field {
+  min-height: 150px;
+  border-radius: 22px;
+  border: 1px dashed rgba(132, 248, 234, 0.36);
+  background: rgba(70, 157, 137, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.node {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bio-cyan);
+  box-shadow: 0 0 10px rgba(120, 254, 235, 0.8);
+  animation: drift 14s ease-in-out infinite;
+}
+
+.future-line {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.3rem, 2.8vw, 2.2rem);
+  color: #dbfff5;
+}
+
+.bio-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -130%);
+  pointer-events: none;
+  z-index: 8;
+  color: #e8fff9;
+  border: 1px solid rgba(167, 255, 241, 0.35);
+  background: rgba(12, 48, 46, 0.65);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fog-drift {
+  from { transform: translate3d(-2%, -1.5%, 0) scale(1); }
+  to { transform: translate3d(2%, 1.8%, 0) scale(1.08); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(0.94); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+@keyframes liquid {
+  0%, 100% { border-radius: 54% 46% 48% 52% / 42% 62% 38% 58%; }
+  50% { border-radius: 38% 62% 59% 41% / 57% 39% 61% 43%; }
+}
+
+@keyframes wave-breath {
+  0%, 100% { transform: scaleY(0.75); opacity: 0.82; }
+  50% { transform: scaleY(1.15); opacity: 1; }
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); opacity: 0.4; }
+  50% { transform: translate(10px, -10px); opacity: 1; }
+}
+
+@media (max-width: 680px) {
+  .hero {
+    min-height: 72vh;
+  }
+
+  .glass-panel {
+    border-radius: 20px;
+  }
+}

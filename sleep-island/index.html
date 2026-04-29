@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sleep Island | Living Ecosystem Dream</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;700&family=Manrope:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="eco-canvas" aria-hidden="true"></canvas>
+  <div class="fog-layer" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="hero">
+    <p class="tag">speculative micro-ecology / nocturnal interface</p>
+    <h1>Sleep Island</h1>
+    <p class="lead">
+      A humid sleep tank where human pressure becomes nourishment.
+      Breathing, agitation, and stillness co-compose an ecosystem of algae, moss, and mycelium.
+    </p>
+    <button id="audio-toggle" class="glass-button">Awaken Ambient Bioacoustics</button>
+  </header>
+
+  <main id="scroll-root">
+    <section class="glass-panel reveal" id="intro">
+      <h2>1. Introduction to Sleep Island</h2>
+      <p>
+        Sleep Island imagines rest as metabolism. Human sleep pressure gently activates micro-pumps,
+        regulating mist and water circulation so microscopic life can gather, root, and glow.
+      </p>
+    </section>
+
+    <section class="glass-panel reveal" id="simulation">
+      <h2>2. Real-time Ecological System Simulation</h2>
+      <div class="metrics">
+        <article><span>Humidity</span><strong id="humidity-val">74%</strong></article>
+        <article><span>Oxygen Flux</span><strong id="oxygen-val">41%</strong></article>
+        <article><span>Sleep Pressure</span><strong id="pressure-val">38%</strong></article>
+        <article><span>Breath Sync</span><strong id="breath-val">0.78</strong></article>
+      </div>
+      <p class="hint">Hover particles to inspect living nodes.</p>
+    </section>
+
+    <section class="glass-panel reveal split" id="transformation">
+      <div>
+        <h2>3. Human Pressure → Ecosystem Transformation</h2>
+        <p>
+          Increasing pressure amplifies pump pulses, thickens moisture layers, and feeds filament growth.
+          Calm sleep gives continuity; restless waves trigger oxygen release.
+        </p>
+      </div>
+      <div class="orbital" id="pressure-orbital">
+        <div class="core"></div>
+        <div class="ring ring-a"></div>
+        <div class="ring ring-b"></div>
+      </div>
+    </section>
+
+    <section class="glass-panel reveal" id="growth">
+      <h2>4. Algae / Moss / Mycelium Growth Status</h2>
+      <div class="growth-grid">
+        <article data-species="Algae">
+          <h3>Algae Bloom</h3>
+          <p id="algae-val">67% vitality</p>
+        </article>
+        <article data-species="Moss">
+          <h3>Moss Weave</h3>
+          <p id="moss-val">53% hydration lock</p>
+        </article>
+        <article data-species="Mycelium">
+          <h3>Mycelium Thread</h3>
+          <p id="mycelium-val">49% connective growth</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="glass-panel reveal split" id="oxygen-humidity">
+      <div>
+        <h2>5. Oxygen Release & Humidity Drift</h2>
+        <p>
+          Emotional agitation in dream phases initiates protective oxygen plumes.
+          Moisture condenses as soft fog, distributing nutrients through capillary channels.
+        </p>
+      </div>
+      <div class="liquid-meter">
+        <div class="liquid-fill" id="liquid-fill"></div>
+      </div>
+    </section>
+
+    <section class="glass-panel reveal" id="breathing">
+      <h2>6. Sleep Breathing Synchronization</h2>
+      <p class="breath-quote">
+        “Inhale, and the tank listens. Exhale, and bioluminescent life exhales with you.”
+      </p>
+      <div class="breath-wave" id="breath-wave"></div>
+    </section>
+
+    <section class="glass-panel reveal" id="network">
+      <h2>7. Planetary Sleep Network Concept</h2>
+      <p>
+        Multiple Sleep Islands could form a distributed nocturnal commons:
+        city-scale dormancy converted into planetary micro-ecological resilience.
+      </p>
+      <div class="node-field" id="node-field"></div>
+    </section>
+
+    <section class="glass-panel reveal" id="future">
+      <h2>8. Speculative Future Narrative</h2>
+      <p class="future-line">
+        Tomorrow, sleep is no longer passive recovery. It is an ecological ritual:
+        post-human care, shared respiration, and living architecture grown from dreams.
+      </p>
+    </section>
+  </main>
+
+  <div id="bio-tooltip" class="bio-tooltip" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
