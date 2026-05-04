@@ -109,10 +109,38 @@ h1 {
   transition: transform 0.4s ease, background 0.5s ease, box-shadow 0.5s ease;
 }
 
+.glass-button.ghost {
+  background: linear-gradient(160deg, rgba(33, 81, 74, 0.24), rgba(34, 88, 102, 0.14));
+  border-color: rgba(132, 211, 201, 0.4);
+}
+
 .glass-button:hover {
   transform: translateY(-2px);
   background: linear-gradient(160deg, rgba(74, 170, 150, 0.32), rgba(66, 180, 207, 0.25));
   box-shadow: 0 0 20px rgba(121, 250, 224, 0.22);
+}
+
+.hero-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.control-button {
+  padding: 0.46rem 0.78rem;
+  font-size: 0.84rem;
+}
+
+.control-button.active {
+  border-color: rgba(162, 255, 236, 0.72);
+  background: linear-gradient(160deg, rgba(76, 174, 150, 0.36), rgba(71, 166, 194, 0.28));
+  box-shadow: 0 0 16px rgba(121, 250, 224, 0.22);
+}
+
+.preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
 }
 
 main {
@@ -180,6 +208,144 @@ main {
 .hint {
   opacity: 0.75;
   font-size: 0.85rem;
+}
+
+.observatory {
+  align-items: start;
+}
+
+.tank-photo {
+  --tank-activity: 0.5;
+  --tank-glow: 0.45;
+  margin: 1rem 0 0;
+  width: min(78%, 360px);
+  margin-inline: auto;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(157, 255, 236, 0.28);
+  background: rgba(9, 34, 36, 0.45);
+  position: relative;
+}
+
+.tank-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0.9;
+  filter: saturate(0.9) hue-rotate(-12deg);
+}
+
+.tank-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 35%, rgba(109, 248, 213, 0.22), transparent 52%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.tank-live {
+  position: absolute;
+  inset: 6% 8% 17% 8%;
+  border-radius: 32% 30% 25% 27% / 24% 25% 30% 34%;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: calc(0.35 + var(--tank-activity) * 0.55);
+}
+
+.algae-flow {
+  position: absolute;
+  inset: 8% 4% 6% 4%;
+  background:
+    radial-gradient(circle at 32% 72%, rgba(129, 255, 196, 0.36), transparent 36%),
+    radial-gradient(circle at 64% 58%, rgba(88, 224, 196, 0.28), transparent 30%),
+    radial-gradient(circle at 45% 35%, rgba(153, 255, 231, 0.22), transparent 38%);
+  filter: saturate(1.1) blur(0.6px);
+  mix-blend-mode: screen;
+  animation: algae-flow 9.5s ease-in-out infinite alternate;
+}
+
+.bio-sheen {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(164, 255, 235, calc(0.06 + var(--tank-glow) * 0.11)), transparent 58%),
+    radial-gradient(circle at 50% 62%, rgba(90, 245, 213, calc(0.07 + var(--tank-glow) * 0.15)), transparent 46%);
+}
+
+.bubble {
+  position: absolute;
+  bottom: -14%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(211, 255, 250, 0.6);
+  box-shadow: 0 0 8px rgba(142, 255, 230, 0.5);
+  animation: bubble-rise 8s linear infinite;
+}
+
+.bubble.b1 { left: 16%; animation-delay: 0s; animation-duration: 7.8s; }
+.bubble.b2 { left: 32%; animation-delay: 2s; animation-duration: 9.4s; width: 5px; height: 5px; }
+.bubble.b3 { left: 50%; animation-delay: 1.3s; animation-duration: 8.6s; }
+.bubble.b4 { left: 69%; animation-delay: 3.2s; animation-duration: 10.1s; width: 7px; height: 7px; }
+.bubble.b5 { left: 83%; animation-delay: 0.7s; animation-duration: 7.2s; width: 4px; height: 4px; }
+
+.tank-photo figcaption {
+  margin: 0;
+  padding: 0.65rem 0.8rem 0.8rem;
+  font-size: 0.82rem;
+  color: rgba(213, 255, 246, 0.82);
+}
+
+.device-panel {
+  border-radius: 20px;
+  border: 1px solid rgba(133, 255, 221, 0.2);
+  background: rgba(12, 42, 44, 0.35);
+  padding: 0.9rem;
+}
+
+.device-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.device-actions .glass-button {
+  margin-top: 0;
+}
+
+.device-status {
+  margin: 0.8rem 0 0.7rem;
+  font-size: 0.9rem;
+  color: rgba(213, 255, 243, 0.84);
+}
+
+.tank-metrics {
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+}
+
+.signal-strip {
+  margin-top: 0.7rem;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(137, 247, 221, 0.22);
+  background: rgba(49, 124, 127, 0.12);
+  overflow: hidden;
+  position: relative;
+}
+
+#signal-line {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 8% 50%, rgba(122, 255, 236, 0.72), transparent 9%),
+    radial-gradient(circle at 28% 50%, rgba(122, 255, 236, 0.34), transparent 12%),
+    radial-gradient(circle at 52% 50%, rgba(122, 255, 236, 0.48), transparent 10%),
+    radial-gradient(circle at 76% 50%, rgba(122, 255, 236, 0.38), transparent 10%),
+    radial-gradient(circle at 92% 50%, rgba(122, 255, 236, 0.62), transparent 8%);
+  filter: blur(0.2px);
+  transform-origin: center;
+  animation: signal-breathe 7s ease-in-out infinite;
 }
 
 .orbital {
@@ -349,6 +515,43 @@ main {
   to { transform: rotate(360deg); }
 }
 
+@keyframes signal-breathe {
+  0%, 100% { transform: scaleY(0.8); opacity: 0.72; }
+  50% { transform: scaleY(1.12); opacity: 1; }
+}
+
+@keyframes algae-flow {
+  0% {
+    transform: translate3d(-2%, 1%, 0) scale(0.98) rotate(-1deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate3d(1%, -2%, 0) scale(1.04) rotate(0.6deg);
+    opacity: 0.82;
+  }
+  100% {
+    transform: translate3d(2%, 2%, 0) scale(1.02) rotate(-0.4deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.6);
+    opacity: 0;
+  }
+  14% {
+    opacity: 0.55;
+  }
+  80% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate3d(-6px, -180px, 0) scale(1.1);
+    opacity: 0;
+  }
+}
+
 @keyframes pulse {
   0%, 100% { transform: scale(0.94); opacity: 0.8; }
   50% { transform: scale(1.1); opacity: 1; }
@@ -376,5 +579,13 @@ main {
 
   .glass-panel {
     border-radius: 20px;
+  }
+
+  .tank-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .tank-photo {
+    width: min(94%, 360px);
   }
 }
