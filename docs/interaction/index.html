@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>橙色小鱼 · 手势跟随互动</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        background: #aee6ff; /* 浅蓝色背景 */
+        overflow: hidden;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: none;
+      }
+
+      #stage {
+        position: fixed;
+        inset: 0;
+      }
+
+      .sidebar {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        transform: none;
+        width: min(50vw, 420px);
+        padding: 6px 8px;
+        background: rgba(255, 255, 255, 0.78);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+        border-radius: 12px;
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        column-gap: 6px;
+        z-index: 5;
+      }
+
+      .sidebar-col {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+        overflow: hidden;
+        padding: 3px 6px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .sidebar-col-main {
+        align-items: flex-start;
+        flex: 0 0 auto;
+      }
+
+      .sidebar-col-debug {
+        align-items: flex-start;
+        flex: 0 0 auto;
+      }
+
+      .sidebar-col-video {
+        align-items: flex-start;
+      }
+
+      .sidebar-video-wrapper {
+        position: absolute;
+        right: 16px;
+        top: 12px;
+        z-index: 6;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+      }
+
+      .sidebar-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #145a7b;
+        margin-bottom: 2px;
+      }
+
+      .sidebar-row {
+        font-size: 12px;
+        color: #245f80;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        white-space: nowrap;
+      }
+
+      .sidebar-row span:first-child {
+        margin-right: 6px;
+      }
+
+      .sidebar-row strong {
+        font-weight: 600;
+        color: #0c4862;
+      }
+
+      .sidebar-btn {
+        margin-top: 6px;
+        padding: 4px 9px;
+        border-radius: 999px;
+        border: none;
+        font-size: 12px;
+        cursor: pointer;
+        color: #ffffff;
+        background: linear-gradient(135deg, #ff9f43, #ff6b6b);
+        box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .sidebar-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 3px 10px rgba(255, 107, 107, 0.4);
+      }
+
+      .sidebar-tip {
+        font-size: 10px;
+        color: #618499;
+        line-height: 1.4;
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-all;
+      }
+
+      .global-tip {
+        position: absolute;
+        top: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 2px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.76);
+        color: #2a607a;
+        font-size: 11px;
+        letter-spacing: 0.2px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+        white-space: nowrap;
+        z-index: 6;
+      }
+
+      .sidebar-debug-toggle {
+        margin-top: 4px;
+        font-size: 10px;
+        color: #4a7288;
+        cursor: default;
+        user-select: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .sidebar-debug-toggle span {
+        font-size: 11px;
+      }
+
+      .debug-panel {
+        margin-top: 6px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(230, 243, 252, 0.95);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        font-size: 11px;
+        color: #1a4b63;
+        display: none;
+      }
+
+      .debug-panel.show {
+        display: block;
+      }
+
+      .debug-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+
+      .debug-row span.value {
+        font-weight: 600;
+      }
+
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      video {
+        width: 140px;
+        height: 84px;
+        opacity: 0.9;
+        pointer-events: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        transform: scaleX(-1); /* 镜像预览，和小鱼方向一致 */
+      }
+
+      .hint {
+        margin-top: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(20, 110, 150, 0.12);
+        background: rgba(255, 255, 255, 0.7);
+        color: #145a7b;
+        font-size: 11px;
+        letter-spacing: 0.2px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 260ms ease;
+        white-space: nowrap;
+        align-self: flex-start;
+      }
+
+      .hint.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div class="global-tip">伸出手移动小鱼，吃小鱼虾，躲开石头。</div>
+      <aside class="sidebar">
+        <div class="sidebar-col sidebar-col-main">
+          <div class="sidebar-title">我的小鱼日记</div>
+          <div class="sidebar-row">
+            <span>本局吃到小鱼虾</span>
+            <strong id="score-current">0</strong>
+          </div>
+          <div class="sidebar-row">
+            <span>历史最高分</span>
+            <strong id="score-best">0</strong>
+          </div>
+          <button id="btn-restart" class="sidebar-btn">
+            ⟳ 重新开始
+          </button>
+        </div>
+        <div class="sidebar-col sidebar-col-debug">
+          <div class="sidebar-debug-toggle">
+            <span>调试信息</span>
+          </div>
+          <div class="debug-panel show" id="debug-panel">
+            <div class="debug-row">
+              <span>当前手势</span>
+              <span class="value" id="dbg-gesture">未检测</span>
+            </div>
+            <div class="debug-row">
+              <span>帧率 FPS</span>
+              <span class="value" id="dbg-fps">--</span>
+            </div>
+            <div class="debug-row">
+              <span>流畅度</span>
+              <span class="value" id="dbg-smooth">--</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+      <div class="sidebar-video-wrapper">
+        <video id="v" playsinline muted></video>
+        <div class="hint" id="hint">如未弹出摄像头权限，请轻触屏幕一次～</div>
+      </div>
+      <canvas id="c"></canvas>
+    </div>
+
+    <!-- MediaPipe Hands 官方 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const video = document.getElementById("v");
+      const hintEl = document.getElementById("hint");
+      const scoreCurrentEl = document.getElementById("score-current");
+      const scoreBestEl = document.getElementById("score-best");
+      const restartBtn = document.getElementById("btn-restart");
+      const debugToggleEl = document.getElementById("debug-toggle");
+      const debugPanelEl = document.getElementById("debug-panel");
+      const dbgGestureEl = document.getElementById("dbg-gesture");
+      const dbgFpsEl = document.getElementById("dbg-fps");
+      const dbgSmoothEl = document.getElementById("dbg-smooth");
+
+      const DPR = () => Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      function fit() {
+        const dpr = DPR();
+        const w = Math.floor(window.innerWidth * dpr);
+        const h = Math.floor(window.innerHeight * dpr);
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+      }
+      window.addEventListener("resize", fit, { passive: true });
+      fit();
+
+      function showHintOnce() {
+        hintEl.classList.add("show");
+        setTimeout(() => hintEl.classList.remove("show"), 3500);
+      }
+      showHintOnce();
+
+      const clamp01 = (x) => Math.max(0, Math.min(1, x));
+      const lerp = (a, b, t) => a + (b - a) * t;
+
+      const game = {
+        currentScore: 0,
+        bestScore: Number(window.localStorage?.getItem("fish-best-score") || 0),
+        fpsEMA: 0,
+      };
+
+      function updateScoreUI() {
+        scoreCurrentEl.textContent = String(game.currentScore);
+        scoreBestEl.textContent = String(game.bestScore);
+      }
+      updateScoreUI();
+
+      const fish = {
+        pos: { x: canvas.width / 2, y: canvas.height / 2 },
+        vel: { x: 0, y: 0 },
+        baseR: 60,
+        scale: 1,
+        targetScale: 1,
+        angle: 0,
+        alive: true,
+        respawnTimer: 0,
+      };
+
+      function updateFishBaseSize() {
+        fish.baseR = Math.min(canvas.width, canvas.height) * 0.05;
+      }
+      updateFishBaseSize();
+
+      const tracking = {
+        hasHand: false,
+        lastSeen: performance.now(),
+        palm: { x: 0.5, y: 0.5 },
+        palmWidth: 0.2,
+        openness: 0,
+        gestureLabel: "未检测",
+      };
+
+      const rocks = [];
+      function initRocks() {
+        rocks.length = 0;
+        const w = canvas.width;
+        const h = canvas.height;
+        const area = (w * h) / (1000 * 1000);
+        const count = Math.max(3, Math.min(8, Math.round(4 + area * 3))); // 明显减少石头数量
+        for (let i = 0; i < count; i++) {
+          const r = 40 + Math.random() * 70;
+          let x, y;
+          const safeRadius = Math.min(w, h) * 0.18;
+          // 尽量不要生成在画面中心，留一个“安全区”
+          do {
+            x = Math.random() * w;
+            y = Math.random() * h;
+          } while (Math.hypot(x - w / 2, y - h / 2) < safeRadius);
+
+          const speed = 12 + Math.random() * 18; // 缓慢移动
+          const ang = Math.random() * Math.PI * 2;
+          rocks.push({
+            x,
+            y,
+            r,
+            wobblePhase: Math.random() * Math.PI * 2,
+            vx: Math.cos(ang) * speed,
+            vy: Math.sin(ang) * speed,
+          });
+        }
+      }
+      initRocks();
+
+      // 小鱼虾（可被进食）
+      const critters = [];
+      function randBetween(a, b) {
+        return a + Math.random() * (b - a);
+      }
+
+      function spawnCritter(forceEdge = false) {
+        const w = canvas.width;
+        const h = canvas.height;
+        const kind = Math.random() < 0.55 ? "shrimp" : "minifish";
+        const r = kind === "shrimp" ? randBetween(8, 14) : randBetween(10, 18);
+        const speed = kind === "shrimp" ? randBetween(45, 85) : randBetween(55, 110);
+        const ang = randBetween(-Math.PI, Math.PI);
+
+        let x = randBetween(0, w);
+        let y = randBetween(0, h);
+        if (forceEdge || Math.random() < 0.75) {
+          const edge = (Math.random() * 4) | 0;
+          if (edge === 0) {
+            x = -40;
+            y = randBetween(0, h);
+          } else if (edge === 1) {
+            x = w + 40;
+            y = randBetween(0, h);
+          } else if (edge === 2) {
+            x = randBetween(0, w);
+            y = -40;
+          } else {
+            x = randBetween(0, w);
+            y = h + 40;
+          }
+        }
+
+        critters.push({
+          kind,
+          x,
+          y,
+          r,
+          vx: Math.cos(ang) * speed,
+          vy: Math.sin(ang) * speed,
+          wob: randBetween(0, Math.PI * 2),
+        });
+      }
+
+      function initCritters() {
+        critters.length = 0;
+        const w = canvas.width;
+        const h = canvas.height;
+        const area = (w * h) / (1000 * 1000);
+        const count = Math.max(8, Math.min(22, Math.round(14 + area * 6)));
+        for (let i = 0; i < count; i++) spawnCritter(false);
+      }
+      initCritters();
+
+      function wrapAngle(a) {
+        while (a > Math.PI) a -= Math.PI * 2;
+        while (a < -Math.PI) a += Math.PI * 2;
+        return a;
+      }
+
+      function limitVec(vx, vy, maxV) {
+        const v = Math.hypot(vx, vy) || 1e-6;
+        if (v <= maxV) return { vx, vy };
+        return { vx: (vx / v) * maxV, vy: (vy / v) * maxV };
+      }
+
+      const bursts = []; // 爆炸表情
+
+      function spawnBurst(x, y) {
+        const life = 1.2;
+        const emojis = [];
+        for (let i = 0; i < 14; i++) {
+          const ang = Math.random() * Math.PI * 2;
+          const speed = 120 + Math.random() * 260;
+          emojis.push({
+            x,
+            y,
+            vx: Math.cos(ang) * speed,
+            vy: Math.sin(ang) * speed,
+            rot: (Math.random() - 0.5) * Math.PI,
+            vr: (Math.random() - 0.5) * 3,
+            scale: 0.6 + Math.random() * 0.8,
+          });
+        }
+        bursts.push({ x, y, t: 0, life, emojis });
+      }
+
+      function spawnHappyBurst(x, y) {
+        const life = 1.0;
+        const emojis = [];
+        const pool = ["😄", "🥳", "😋", "✨"];
+        for (let i = 0; i < 12; i++) {
+          const ang = Math.random() * Math.PI * 2;
+          const speed = 90 + Math.random() * 220;
+          emojis.push({
+            x,
+            y,
+            vx: Math.cos(ang) * speed,
+            vy: Math.sin(ang) * speed - 60,
+            rot: (Math.random() - 0.5) * Math.PI,
+            vr: (Math.random() - 0.5) * 3,
+            scale: 0.55 + Math.random() * 0.9,
+            emoji: pool[(Math.random() * pool.length) | 0],
+          });
+        }
+        bursts.push({ x, y, t: 0, life, emojis });
+      }
+
+      const hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      });
+
+      hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.6,
+        minTrackingConfidence: 0.6,
+        selfieMode: true,
+      });
+
+      hands.onResults((res) => {
+        const now = performance.now();
+        const lms = res.multiHandLandmarks;
+        if (!lms || !lms.length) {
+          tracking.hasHand = false;
+          return;
+        }
+        const lm = lms[0];
+        tracking.hasHand = true;
+        tracking.lastSeen = now;
+
+        const wrist = lm[0];
+        const midMcp = lm[9];
+        const palm = { x: (wrist.x + midMcp.x) * 0.5, y: (wrist.y + midMcp.y) * 0.5 };
+        tracking.palm.x = palm.x;
+        tracking.palm.y = palm.y;
+
+        const refA = lm[5];
+        const refB = lm[17];
+        const palmWidth = Math.hypot(refA.x - refB.x, refA.y - refB.y) || 1e-6;
+        tracking.palmWidth = palmWidth;
+
+        // 简单手势：根据张开程度判断“手掌张开 / 握拳 / 半开”
+        const tips = [4, 8, 12, 16, 20];
+        let sum = 0;
+        for (const t of tips) {
+          sum += Math.hypot(lm[t].x - palm.x, lm[t].y - palm.y);
+        }
+        const avg = sum / tips.length;
+        const norm = avg / palmWidth;
+        const open01 = clamp01((norm - 0.65) / (1.3 - 0.65));
+        tracking.openness = open01;
+        let label = "半开手掌";
+        if (open01 > 0.75) label = "手掌张开";
+        else if (open01 < 0.3) label = "握拳";
+        tracking.gestureLabel = label;
+      });
+
+      let camera = null;
+      let startAttempted = false;
+      async function startCamera() {
+        if (camera || startAttempted) return;
+        startAttempted = true;
+        try {
+          camera = new Camera(video, {
+            onFrame: async () => {
+              await hands.send({ image: video });
+            },
+            width: 640,
+            height: 480,
+          });
+          camera.start();
+        } catch (e) {
+          console.warn("camera start failed", e);
+          startAttempted = false;
+          throw e;
+        }
+      }
+
+      startCamera().catch(() => {});
+      window.addEventListener(
+        "pointerdown",
+        () => {
+          startCamera().catch(() => {});
+        },
+        { once: true }
+      );
+
+      // 重新开始：重置分数 & 位置 & 障碍
+      restartBtn.addEventListener("click", () => {
+        game.currentScore = 0;
+        updateScoreUI();
+
+        fish.pos.x = canvas.width / 2;
+        fish.pos.y = canvas.height / 2;
+        fish.vel.x = 0;
+        fish.vel.y = 0;
+        fish.scale = 1;
+        fish.targetScale = 1;
+        fish.alive = true;
+        fish.respawnTimer = 0;
+
+        initRocks();
+        initCritters();
+      });
+
+      let lastT = performance.now();
+      function tick(now) {
+        const dt = Math.min(0.05, (now - lastT) / 1000);
+        lastT = now;
+
+        // FPS 统计（用于调试面板）
+        if (dt > 0 && dt < 1) {
+          const fps = 1 / dt;
+          game.fpsEMA = game.fpsEMA ? lerp(game.fpsEMA, fps, 0.12) : fps;
+          const fpsShow = game.fpsEMA.toFixed(1);
+          dbgFpsEl.textContent = `${fpsShow}`;
+          let smooth = "偏卡";
+          if (game.fpsEMA >= 24) smooth = "流畅";
+          else if (game.fpsEMA >= 10) smooth = "勉强流畅（≥10 FPS）";
+          dbgSmoothEl.textContent = smooth;
+        }
+
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // 手是否存在
+        const handLostFor = now - tracking.lastSeen;
+        const handPresent = tracking.hasHand && handLostFor < 250;
+        if (!handPresent) tracking.hasHand = false;
+        dbgGestureEl.textContent = tracking.hasHand ? tracking.gestureLabel : "未检测";
+
+        let tx = w / 2;
+        let ty = h / 2;
+        if (handPresent) {
+          tx = tracking.palm.x * w;
+          ty = tracking.palm.y * h;
+        }
+
+        // 手离摄像头的远近 → 小鱼缩放
+        let scale01 = (tracking.palmWidth - 0.05) / (0.18 - 0.05);
+        scale01 = clamp01(scale01);
+        const minScale = 0.6;
+        const maxScale = 2.0;
+        fish.targetScale = handPresent ? lerp(minScale, maxScale, scale01) : 1;
+        fish.scale = lerp(fish.scale, fish.targetScale, dt * 4);
+
+        // 鱼的弹性跟随
+        const stiffness = handPresent ? 9 : 3;
+        const damping = 12;
+        const ax = (tx - fish.pos.x) * stiffness - fish.vel.x * damping;
+        const ay = (ty - fish.pos.y) * stiffness - fish.vel.y * damping;
+        fish.vel.x += ax * dt;
+        fish.vel.y += ay * dt;
+        fish.pos.x += fish.vel.x * dt;
+        fish.pos.y += fish.vel.y * dt;
+
+        // 朝向
+        fish.angle = Math.atan2(fish.vel.y, fish.vel.x);
+
+        if (!fish.alive) {
+          fish.respawnTimer -= dt;
+          if (fish.respawnTimer <= 0) {
+            fish.alive = true;
+          }
+        }
+
+        // 石头小漂浮 + 缓慢移动（界面不断变化）
+        for (const rock of rocks) {
+          rock.wobblePhase += dt * 0.5;
+          rock.x += rock.vx * dt;
+          rock.y += rock.vy * dt;
+
+          const margin = 80;
+          if (rock.x < -margin || rock.x > w + margin || rock.y < -margin || rock.y > h + margin) {
+            // 离开画面较远时重新随机一个位置和方向
+            const ang = Math.random() * Math.PI * 2;
+            const speed = 12 + Math.random() * 18;
+            rock.x = Math.random() * w;
+            rock.y = Math.random() * h;
+            rock.vx = Math.cos(ang) * speed;
+            rock.vy = Math.sin(ang) * speed;
+          }
+        }
+
+        // 小鱼虾移动：群聚（对齐+聚合+分离）+ 避障（石头）+ 逃离主鱼
+        const fishX = fish.pos.x;
+        const fishY = fish.pos.y;
+        const fishR = fish.baseR * fish.scale;
+
+        for (let i = critters.length - 1; i >= 0; i--) {
+          const c = critters[i];
+
+          const isShrimp = c.kind === "shrimp";
+          const maxV = isShrimp ? 120 : 155;
+          const maxForce = isShrimp ? 140 : 170; // 加速度上限
+          const neighborR = isShrimp ? 140 : 180;
+          const sepR = isShrimp ? 34 : 42;
+          // 不再“逃离主鱼”，否则很难进食
+
+          // 基础噪声（保留一点“活”的感觉）
+          c.wob += dt * (isShrimp ? 3.8 : 2.2);
+          let fx = Math.sin(c.wob * 1.3) * (isShrimp ? 16 : 12);
+          let fy = Math.cos(c.wob * 1.1) * (isShrimp ? 12 : 10);
+
+          // 群聚邻居统计
+          let cnt = 0;
+          let avgVx = 0,
+            avgVy = 0;
+          let centerX = 0,
+            centerY = 0;
+          let sepX = 0,
+            sepY = 0;
+
+          for (let j = 0; j < critters.length; j++) {
+            if (j === i) continue;
+            const o = critters[j];
+            const dx = o.x - c.x;
+            const dy = o.y - c.y;
+            const d = Math.hypot(dx, dy);
+            if (d < 1e-6) continue;
+            if (d <= neighborR) {
+              cnt++;
+              avgVx += o.vx;
+              avgVy += o.vy;
+              centerX += o.x;
+              centerY += o.y;
+              if (d < sepR) {
+                const inv = 1 / (d * d);
+                sepX -= dx * inv;
+                sepY -= dy * inv;
+              }
+            }
+          }
+
+          if (cnt > 0) {
+            // alignment（对齐）
+            avgVx /= cnt;
+            avgVy /= cnt;
+            const align = limitVec(avgVx, avgVy, maxV);
+            fx += (align.vx - c.vx) * 0.55;
+            fy += (align.vy - c.vy) * 0.55;
+
+            // cohesion（聚合）
+            centerX /= cnt;
+            centerY /= cnt;
+            fx += (centerX - c.x) * 0.18;
+            fy += (centerY - c.y) * 0.18;
+
+            // separation（分离）
+            fx += sepX * 65;
+            fy += sepY * 65;
+          }
+
+          // 避障：远离石头（越近推力越大）
+          for (const rock of rocks) {
+            const dx = c.x - rock.x;
+            const dy = c.y - rock.y;
+            const d = Math.hypot(dx, dy) || 1e-6;
+            const avoidR = rock.r + c.r + (isShrimp ? 60 : 80);
+            if (d < avoidR) {
+              const t = 1 - d / avoidR;
+              fx += (dx / d) * (320 + 520 * t) * t;
+              fy += (dy / d) * (320 + 520 * t) * t;
+            }
+          }
+
+          // 不再“逃离主鱼”（保留群聚+避障即可）
+
+          // 轻微吸向屏幕中心（防止长时间贴边跑丢）
+          fx += (w * 0.5 - c.x) * 0.002;
+          fy += (h * 0.5 - c.y) * 0.002;
+
+          // 限制加速度并积分
+          const f = limitVec(fx, fy, maxForce);
+          c.vx += f.vx * dt;
+          c.vy += f.vy * dt;
+
+          // 速度限制 + 少量阻尼
+          c.vx *= 1 - dt * 0.08;
+          c.vy *= 1 - dt * 0.08;
+          const vv = limitVec(c.vx, c.vy, maxV);
+          c.vx = vv.vx;
+          c.vy = vv.vy;
+
+          c.x += c.vx * dt;
+          c.y += c.vy * dt;
+
+          // 离开画面后重生
+          if (c.x < -80 || c.x > w + 80 || c.y < -80 || c.y > h + 80) {
+            critters.splice(i, 1);
+            spawnCritter(true);
+          }
+        }
+
+        // 碰撞检测
+        if (fish.alive) {
+          const fr = fish.baseR * fish.scale * 0.9;
+          for (const rock of rocks) {
+            const dx = fish.pos.x - rock.x;
+            const dy = fish.pos.y - rock.y;
+            const dist = Math.hypot(dx, dy);
+            const rr = fr + rock.r;
+            if (dist < rr) {
+              fish.alive = false;
+              fish.respawnTimer = 1.4;
+              spawnBurst(fish.pos.x, fish.pos.y);
+              break;
+            }
+          }
+        }
+
+        // 进食：小鱼碰到小鱼虾
+        if (fish.alive) {
+          const frEat = fish.baseR * fish.scale * 0.95;
+          for (let i = critters.length - 1; i >= 0; i--) {
+            const c = critters[i];
+            const dx = fish.pos.x - c.x;
+            const dy = fish.pos.y - c.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < frEat + c.r) {
+              critters.splice(i, 1);
+              spawnHappyBurst(c.x, c.y);
+              spawnCritter(true);
+
+              game.currentScore += 1;
+              if (game.currentScore > game.bestScore) {
+                game.bestScore = game.currentScore;
+                try {
+                  window.localStorage.setItem("fish-best-score", String(game.bestScore));
+                } catch (_) {}
+              }
+              updateScoreUI();
+            }
+          }
+        }
+
+        // 爆炸表情更新
+        for (let i = bursts.length - 1; i >= 0; i--) {
+          const b = bursts[i];
+          b.t += dt;
+          const life01 = b.t / b.life;
+          if (life01 >= 1) {
+            bursts.splice(i, 1);
+            continue;
+          }
+          const g = 420;
+          for (const e of b.emojis) {
+            e.vy += g * dt;
+            e.x += e.vx * dt;
+            e.y += e.vy * dt;
+            e.rot += e.vr * dt;
+          }
+        }
+
+        drawScene(w, h);
+        requestAnimationFrame(tick);
+      }
+
+      function drawScene(w, h) {
+        // 背景：浅蓝到更浅的渐变
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, "#b6ecff");
+        g.addColorStop(0.5, "#aee6ff");
+        g.addColorStop(1, "#a3defc");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        drawRocks();
+        drawCritters();
+        if (fish.alive) {
+          drawFish();
+        }
+        drawBursts();
+      }
+
+      function drawCritters() {
+        ctx.save();
+        for (const c of critters) {
+          const ang = Math.atan2(c.vy, c.vx);
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          if (isFinite(ang)) ctx.rotate(ang);
+
+          if (c.kind === "minifish") {
+            const r = c.r;
+            const grad = ctx.createLinearGradient(-r, -r, r, r);
+            grad.addColorStop(0, "rgba(255, 245, 235, 0.95)");
+            grad.addColorStop(0.6, "rgba(255, 196, 120, 0.95)");
+            grad.addColorStop(1, "rgba(255, 140, 0, 0.9)");
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, r * 1.2, r * 0.8, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "rgba(255, 120, 90, 0.95)";
+            ctx.beginPath();
+            ctx.moveTo(-r * 1.15, 0);
+            ctx.lineTo(-r * 1.75, -r * 0.45);
+            ctx.lineTo(-r * 1.75, r * 0.45);
+            ctx.closePath();
+            ctx.fill();
+          } else {
+            const r = c.r;
+            ctx.strokeStyle = "rgba(255, 120, 150, 0.95)";
+            ctx.lineWidth = Math.max(2, r * 0.22);
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.arc(0, 0, r * 0.9, Math.PI * 0.15, Math.PI * 0.95);
+            ctx.stroke();
+
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+            ctx.lineWidth = Math.max(1.5, r * 0.14);
+            ctx.beginPath();
+            ctx.moveTo(r * 0.55, -r * 0.25);
+            ctx.quadraticCurveTo(r * 1.2, -r * 0.55, r * 1.55, -r * 0.2);
+            ctx.moveTo(r * 0.55, r * 0.05);
+            ctx.quadraticCurveTo(r * 1.15, -r * 0.05, r * 1.55, r * 0.25);
+            ctx.stroke();
+          }
+
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function drawRocks() {
+        ctx.save();
+        for (const rock of rocks) {
+          const bob = Math.sin(rock.wobblePhase) * (rock.r * 0.05);
+          const x = rock.x;
+          const y = rock.y + bob;
+          const r = rock.r;
+
+          const grad = ctx.createRadialGradient(x - r * 0.3, y - r * 0.5, r * 0.2, x, y, r * 1.2);
+          grad.addColorStop(0, "rgba(255,255,255,0.9)");
+          grad.addColorStop(0.3, "rgba(180, 196, 210, 0.9)");
+          grad.addColorStop(1, "rgba(90, 110, 130, 1)");
+          ctx.fillStyle = grad;
+
+          ctx.beginPath();
+          ctx.moveTo(x - r * 0.9, y + r * 0.3);
+          ctx.quadraticCurveTo(x - r * 0.6, y - r * 0.8, x, y - r);
+          ctx.quadraticCurveTo(x + r * 0.9, y - r * 0.4, x + r * 0.8, y + r * 0.4);
+          ctx.quadraticCurveTo(x, y + r * 0.9, x - r * 0.9, y + r * 0.3);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawFish() {
+        const cx = fish.pos.x;
+        const cy = fish.pos.y;
+        const r = fish.baseR * fish.scale;
+        const angle = fish.angle || 0;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        if (isFinite(angle)) {
+          ctx.rotate(angle);
+        }
+
+        // 身体（橙色小鱼，略带小鸟的尖嘴造型）
+        const bodyGrad = ctx.createLinearGradient(-r, -r, r, r);
+        bodyGrad.addColorStop(0, "#ffb347");
+        bodyGrad.addColorStop(0.5, "#ff8c00");
+        bodyGrad.addColorStop(1, "#ff5b00");
+        ctx.fillStyle = bodyGrad;
+
+        ctx.beginPath();
+        ctx.moveTo(-r * 0.6, -r * 0.6);
+        ctx.quadraticCurveTo(r * 0.2, -r * 0.9, r * 0.9, -r * 0.1);
+        ctx.quadraticCurveTo(r * 1.0, 0, r * 0.9, r * 0.1);
+        ctx.quadraticCurveTo(r * 0.2, r * 0.9, -r * 0.6, r * 0.6);
+        ctx.quadraticCurveTo(-r * 0.8, 0, -r * 0.6, -r * 0.6);
+        ctx.closePath();
+        ctx.fill();
+
+        // 尾巴（粉色三角）
+        ctx.fillStyle = "#ff4f7d";
+        ctx.beginPath();
+        ctx.moveTo(-r * 0.75, -r * 0.2);
+        ctx.lineTo(-r * 1.3, 0);
+        ctx.lineTo(-r * 0.75, r * 0.2);
+        ctx.closePath();
+        ctx.fill();
+
+        // 背鳍
+        ctx.beginPath();
+        ctx.moveTo(-r * 0.15, -r * 0.4);
+        ctx.lineTo(r * 0.05, -r * 0.9);
+        ctx.lineTo(r * 0.2, -r * 0.4);
+        ctx.closePath();
+        ctx.fill();
+
+        // 眼睛
+        const eyeX = r * 0.4;
+        const eyeY = -r * 0.1;
+        const eyeR = r * 0.16;
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(eyeX, eyeY, eyeR, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#333";
+        ctx.beginPath();
+        ctx.arc(eyeX + eyeR * 0.15, eyeY, eyeR * 0.55, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 嘴（更像小鸟的尖嘴）
+        ctx.strokeStyle = "#c44100";
+        ctx.lineWidth = Math.max(2, r * 0.06);
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(r * 0.95, -r * 0.05);
+        ctx.lineTo(r * 1.15, 0);
+        ctx.lineTo(r * 0.95, r * 0.05);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawBursts() {
+        if (!bursts.length) return;
+        ctx.save();
+        for (const b of bursts) {
+          const life01 = clamp01(b.t / b.life);
+          const alpha = 1 - life01;
+          for (const e of b.emojis) {
+            ctx.save();
+            ctx.translate(e.x, e.y);
+            ctx.rotate(e.rot);
+            const s = e.scale * (0.8 + 0.4 * (1 - life01));
+            ctx.scale(s, s);
+            ctx.font = "40px system-ui";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = `rgba(255,255,255,${0.95 * alpha})`;
+            ctx.fillText(e.emoji || "😭", 0, 0);
+            ctx.restore();
+          }
+        }
+        ctx.restore();
+      }
+
+      requestAnimationFrame(tick);
+
+      window.addEventListener(
+        "resize",
+        () => {
+          fit();
+          updateFishBaseSize();
+          initRocks();
+          initCritters();
+        },
+        { passive: true }
+      );
+    </script>
+  </body>
+</html>
+

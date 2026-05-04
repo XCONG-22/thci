@@ -53,6 +53,14 @@ npm run dev
 - `presentation/`：演示文稿 HTML / 大纲（可单独下载浏览）
 - `interaction/`：课程 interaction 页面
 
+### 橙色小鱼 · 手势互动（GitHub Pages）
+
+在 **Settings → Pages** 中已选择 **`/docs`** 作为发布源时，可在浏览器直接打开（需 HTTPS，并允许摄像头）：
+
+**https://xcong-22.github.io/thci/interaction/**
+
+页面源码为单文件：**`docs/interaction/index.html`**（使用 MediaPipe Hands 官方 CDN）。
+
 ## 小组成员
 
 陈清扬（MC569302）、李伊萱（MC569245）
