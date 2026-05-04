@@ -40,6 +40,14 @@ npm run dev
 
 若幻灯里图片空白，请将 PNG 截图提交到 **`docs/presentation-assets/`**（文件名见该目录内说明）。
 
+### 深海水母 · 手势互动小游戏（GitHub Pages）
+
+在 **Settings → Pages** 中已选择 **`/docs`** 作为发布源时，可在浏览器直接打开（需 HTTPS，并允许摄像头）：
+
+**https://xcong-22.github.io/thci/game/index.html**
+
+页面源码为单文件：**`docs/game/index.html`**（使用 MediaPipe Hands 官方 CDN）。
+
 ### 其它目录
 
 - `presentation/`：演示文稿 HTML / 大纲（可单独下载浏览）

@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>可爱的调皮水母 · 手势互动</title>
+    <style>
+      :root {
+        --bg-top: #071b46;
+        --bg-mid: #05051b;
+        --bg-bottom: #020012;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: radial-gradient(circle at 18% 0%, #1a4e70 0%, var(--bg-mid) 55%, var(--bg-bottom) 100%);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+          "Microsoft YaHei", sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: none;
+      }
+
+      #stage {
+        position: fixed;
+        inset: 0;
+      }
+
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      /* 仅用于给 MediaPipe 输入，画面不显示 */
+      video {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .hint {
+        position: absolute;
+        left: 50%;
+        bottom: 10%;
+        transform: translateX(-50%);
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(170, 220, 255, 0.16);
+        background: linear-gradient(180deg, rgba(6, 8, 24, 0.72), rgba(8, 12, 30, 0.45));
+        color: rgba(235, 245, 255, 0.86);
+        font-size: 14px;
+        letter-spacing: 0.2px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.28);
+        opacity: 0;
+        transition: opacity 480ms ease;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+
+      .hint.show {
+        opacity: 1;
+      }
+
+      .hint.fadeout {
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <canvas id="c"></canvas>
+      <video id="v" playsinline muted></video>
+      <div class="hint" id="hint">把手伸到镜头前试试～（如未弹出权限，轻触屏幕）</div>
+    </div>
+
+    <!-- 官方 CDN（仅 MediaPipe Hands 依赖） -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+    <script>
+      /**
+       * 可爱的调皮水母 · 单文件手势互动
+       * - 仅外部依赖：MediaPipe Hands 官方 CDN
+       * - 渲染：Canvas 2D
+       * - 手势：张开、握拳、快速开合（1 秒 >= 3 次）
+       */
+
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d", { alpha: false });
+      const video = document.getElementById("v");
+      const hintEl = document.getElementById("hint");
+
+      const DPR = () => Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      function fit() {
+        const dpr = DPR();
+        const w = Math.floor(window.innerWidth * dpr);
+        const h = Math.floor(window.innerHeight * dpr);
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+      }
+      window.addEventListener("resize", fit, { passive: true });
+      fit();
+
+      // --- 提示：显示 3 秒淡出（满足“第一次可有提示”） ---
+      function showHintOnce() {
+        hintEl.classList.add("show");
+        setTimeout(() => hintEl.classList.add("fadeout"), 3000);
+        setTimeout(() => hintEl.remove(), 3800);
+      }
+      showHintOnce();
+
+      // --- 工具函数 ---
+      const clamp01 = (x) => Math.max(0, Math.min(1, x));
+      const lerp = (a, b, t) => a + (b - a) * t;
+      const smoothstep = (a, b, x) => {
+        const t = clamp01((x - a) / (b - a || 1));
+        return t * t * (3 - 2 * t);
+      };
+
+      // --- 场景：背景微光粒子 ---
+      const bgDots = [];
+      function initBgDots() {
+        bgDots.length = 0;
+        const w = canvas.width;
+        const h = canvas.height;
+        const count = Math.round((w * h) / 55000);
+        for (let i = 0; i < count; i++) {
+          bgDots.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: 0.8 + Math.random() * 2.2,
+            vx: -2 - Math.random() * 8,
+            vy: -6 - Math.random() * 18,
+            a: 0.03 + Math.random() * 0.12,
+            hue: 150 + Math.random() * 50, // 偏绿的微光
+          });
+        }
+      }
+      initBgDots();
+
+      // --- 粒子系统：彩色气泡 & 黑色小颗粒 & 心形泡泡 ---
+      const bubbles = [];
+      const inks = [];
+
+      function spawnColorBubbles(n, origin, baseUp = 80, spread = 60) {
+        const palette = [
+          "rgba(255, 182, 193, 0.9)", // 粉
+          "rgba(173, 216, 230, 0.9)", // 浅蓝
+          "rgba(255, 250, 205, 0.9)", // 淡黄
+          "rgba(221, 160, 221, 0.9)", // 浅紫
+        ];
+        for (let i = 0; i < n; i++) {
+          const a = -Math.PI / 2 + (Math.random() - 0.5) * 0.9;
+          const s = baseUp * (0.7 + Math.random() * 0.8);
+          const r = 3 + Math.random() * 10;
+          bubbles.push({
+            kind: "bubble",
+            x: origin.x + (Math.random() - 0.5) * spread,
+            y: origin.y + (Math.random() - 0.2) * spread,
+            vx: Math.cos(a) * s * 0.25,
+            vy: Math.sin(a) * s,
+            r,
+            life: 1.3 + Math.random() * 0.9,
+            maxLife: 1.3 + Math.random() * 0.9,
+            color: palette[(Math.random() * palette.length) | 0],
+            pop: Math.random() < 0.18,
+          });
+        }
+      }
+
+      function spawnSilverBubbles(n, origin) {
+        for (let i = 0; i < n; i++) {
+          bubbles.push({
+            kind: "silver",
+            x: origin.x + (Math.random() - 0.5) * 24,
+            y: origin.y + 10 + Math.random() * 18,
+            vx: (Math.random() - 0.5) * 10,
+            vy: -(25 + Math.random() * 35),
+            r: 2 + Math.random() * 5,
+            life: 2.0 + Math.random() * 1.2,
+            maxLife: 2.0 + Math.random() * 1.2,
+          });
+        }
+      }
+
+      function spawnInkDrops(n, origin) {
+        for (let i = 0; i < n; i++) {
+          inks.push({
+            x: origin.x + (Math.random() - 0.5) * 34,
+            y: origin.y + (Math.random() - 0.2) * 22,
+            vx: (Math.random() - 0.5) * 18,
+            vy: 90 + Math.random() * 140,
+            r: 1.6 + Math.random() * 2.8,
+            life: 0.9 + Math.random() * 0.7,
+            maxLife: 0.9 + Math.random() * 0.7,
+          });
+        }
+      }
+
+      function spawnHeartBubbles(n, origin) {
+        for (let i = 0; i < n; i++) {
+          const a = -Math.PI / 2 + (Math.random() - 0.5) * 0.7;
+          const s = 30 + Math.random() * 30;
+          bubbles.push({
+            kind: "heart",
+            x: origin.x + (Math.random() - 0.5) * 26,
+            y: origin.y - (Math.random() * 20),
+            vx: Math.cos(a) * s * 0.35,
+            vy: Math.sin(a) * s,
+            r: 10 + Math.random() * 14,
+            life: 2.4 + Math.random() * 1.2,
+            maxLife: 2.4 + Math.random() * 1.2,
+            color:
+              Math.random() < 0.5
+                ? "rgba(255, 182, 193, 0.9)"
+                : "rgba(255, 105, 180, 0.9)",
+          });
+        }
+      }
+
+      // --- 水母对象 ---
+      const jelly = {
+        pos: { x: canvas.width / 2, y: canvas.height / 2 },
+        vel: { x: 0, y: 0 },
+        baseR: 120,
+        scale: 1,
+        glow: 0.75,
+        color: { r: 240, g: 215, b: 255 },
+        // “怕怕抖动”用
+        shake: 0,
+      };
+
+      function updateJellyBaseSize() {
+        jelly.baseR = Math.min(canvas.width, canvas.height) * 0.11; // 竖屏优先，约屏幕 1/5
+      }
+      updateJellyBaseSize();
+
+      // --- 手势识别数据 ---
+      const tracking = {
+        hasHand: false,
+        // 归一化 0..1 的屏幕坐标（镜像后）
+        palm: { x: 0.5, y: 0.5 },
+        openness: 0, // 0=拳头，1=张开
+        lastSeen: performance.now(),
+        opennessHistory: [], // {t, v}
+      };
+
+      // --- 状态机 ---
+      const State = {
+        IDLE: "idle",
+        OPEN: "open",
+        FIST: "fist",
+        FAST: "fast",
+      };
+      let state = State.IDLE;
+      let stateT0 = performance.now();
+
+      // 背景闪光 & 心跳光晕
+      let bgFlash = 0;
+      let beatPhase = 0;
+      let lastBeatS = 0;
+      let lastAutoBubble = performance.now();
+      let nextIdleTrickAt = performance.now() + 8000;
+
+      function setState(s) {
+        if (state === s) return;
+        state = s;
+        stateT0 = performance.now();
+        if (state === State.FAST) {
+          beatPhase = 0;
+          lastBeatS = 0;
+        }
+      }
+
+      // --- MediaPipe Hands ---
+      const hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      });
+
+      hands.setOptions({
+        maxNumHands: 2, // 允许识别两只，用于“优先右手”
+        modelComplexity: 1,
+        minDetectionConfidence: 0.6,
+        minTrackingConfidence: 0.6,
+        selfieMode: true, // 镜像输入（像照镜子）
+      });
+
+      hands.onResults((res) => {
+        const now = performance.now();
+        const lms = res.multiHandLandmarks;
+        const handed = res.multiHandedness;
+
+        if (!lms || lms.length === 0) {
+          tracking.hasHand = false;
+          return;
+        }
+
+        // 优先右手：如果检测到 Right 则选 Right，否则取第一只
+        let idx = 0;
+        if (handed && handed.length) {
+          const rightIdx = handed.findIndex((h) => (h.label || h.categoryName) === "Right");
+          idx = rightIdx >= 0 ? rightIdx : 0;
+        }
+
+        const lm = lms[idx];
+        tracking.hasHand = true;
+        tracking.lastSeen = now;
+
+        // 取“手腕+中指掌根”的中点近似手心
+        const wrist = lm[0];
+        const midMcp = lm[9];
+        const palm = { x: (wrist.x + midMcp.x) * 0.5, y: (wrist.y + midMcp.y) * 0.5 };
+
+        // selfieMode 已镜像；这里直接用
+        tracking.palm.x = palm.x;
+        tracking.palm.y = palm.y;
+
+        // 开合程度：指尖到手心距离的平均值，按“掌宽”归一化
+        const tips = [4, 8, 12, 16, 20];
+        const refA = lm[5]; // 食指根部
+        const refB = lm[17]; // 小指根部
+        const palmWidth = Math.hypot(refA.x - refB.x, refA.y - refB.y) || 1e-6;
+
+        let sum = 0;
+        for (const t of tips) {
+          sum += Math.hypot(lm[t].x - palm.x, lm[t].y - palm.y);
+        }
+        const avg = sum / tips.length;
+        const norm = avg / palmWidth; // 越大越张开
+        const open01 = clamp01((norm - 0.65) / (1.25 - 0.65)); // 需要时可微调
+        tracking.openness = open01;
+
+        tracking.opennessHistory.push({ t: now, v: open01 });
+        const oneSecAgo = now - 1000;
+        tracking.opennessHistory = tracking.opennessHistory.filter((e) => e.t >= oneSecAgo);
+      });
+
+      // --- 识别“快速开合”（1 秒内开合 >= 3 次） ---
+      function fastToggleCount() {
+        const h = tracking.opennessHistory;
+        if (h.length < 3) return 0;
+        let min = 1,
+          max = 0;
+        for (const e of h) {
+          if (e.v < min) min = e.v;
+          if (e.v > max) max = e.v;
+        }
+        // 幅度太小不算开合
+        if (max - min < 0.35) return 0;
+        const mid = (min + max) * 0.5;
+        let count = 0;
+        let side = h[0].v > mid;
+        for (let i = 1; i < h.length; i++) {
+          const s = h[i].v > mid;
+          if (s !== side) {
+            count++;
+            side = s;
+          }
+        }
+        return count;
+      }
+
+      // --- 相机启动：尽量自动启动；如浏览器要求手势，则等待一次轻触 ---
+      let camera = null;
+      let startAttempted = false;
+      async function startCamera() {
+        if (camera || startAttempted) return;
+        startAttempted = true;
+
+        try {
+          // Camera utils 会内部调用 getUserMedia
+          camera = new Camera(video, {
+            onFrame: async () => {
+              await hands.send({ image: video });
+            },
+            width: 640,
+            height: 480,
+          });
+          camera.start();
+        } catch (e) {
+          console.warn("camera start failed", e);
+          // 某些移动端必须有用户手势触发权限弹窗：允许再次尝试
+          startAttempted = false;
+          throw e;
+        }
+      }
+
+      // 尝试自动启动（如果浏览器允许，会直接弹权限）
+      startCamera().catch(() => {});
+      // 再绑定一次“轻触/点击即可启动”作为兼容兜底（无按钮）
+      window.addEventListener(
+        "pointerdown",
+        () => {
+          startCamera().catch(() => {});
+        },
+        { once: true }
+      );
+
+      // --- 主循环：动画 + 状态机 + 渲染 ---
+      let lastT = performance.now();
+      function tick(now) {
+        const dt = Math.min(0.05, (now - lastT) / 1000);
+        lastT = now;
+
+        // 背景微光粒子更新
+        const w = canvas.width;
+        const h = canvas.height;
+        for (const p of bgDots) {
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          if (p.y < -30 || p.x < -30) {
+            p.x = w + Math.random() * 40;
+            p.y = h + Math.random() * 40;
+            p.r = 0.8 + Math.random() * 2.2;
+            p.a = 0.03 + Math.random() * 0.12;
+            p.hue = 150 + Math.random() * 50;
+          }
+        }
+
+        // 失去手：5~8 秒后回中间
+        const handLostFor = now - tracking.lastSeen;
+        const handPresent = tracking.hasHand && handLostFor < 250;
+        if (!handPresent) tracking.hasHand = false;
+
+        // 只有两类主要手势 + 快速开合
+        if (handPresent) {
+          const fast = fastToggleCount();
+          if (fast >= 6) {
+            setState(State.FAST);
+          } else if (tracking.openness > 0.78) {
+            setState(State.OPEN);
+          } else if (tracking.openness < 0.24) {
+            setState(State.FIST);
+          } else if (state !== State.FAST) {
+            setState(State.IDLE);
+          }
+        } else {
+          // 没手后先不立刻回中间；超过 5~8 秒才慢慢“回家”
+          if (handLostFor > 5000) setState(State.IDLE);
+        }
+
+        // 目标点：手心（镜像后的归一化坐标）→ 屏幕
+        let tx = w / 2;
+        let ty = h / 2;
+        if (handPresent) {
+          tx = tracking.palm.x * w;
+          ty = tracking.palm.y * h;
+        } else {
+          // 回家：慢慢往中心靠
+          tx = w / 2;
+          ty = h / 2;
+        }
+
+        // 跟随：弹性 + 阻尼（可爱迟滞感）
+        const stiffness = handPresent ? 7 : 2.2;
+        const damping = 9;
+        const ax = (tx - jelly.pos.x) * stiffness - jelly.vel.x * damping;
+        const ay = (ty - jelly.pos.y) * stiffness - jelly.vel.y * damping;
+        jelly.vel.x += ax * dt;
+        jelly.vel.y += ay * dt;
+        jelly.pos.x += jelly.vel.x * dt;
+        jelly.pos.y += jelly.vel.y * dt;
+
+        // 状态动画（缩放、颜色、抖动、心跳）
+        if (bgFlash > 0) bgFlash = Math.max(0, bgFlash - dt * 0.8);
+        jelly.shake = lerp(jelly.shake, 0, dt * 8);
+
+        if (state === State.OPEN) {
+          const t = clamp01((now - stateT0) / 420);
+          jelly.scale = lerp(jelly.scale, 1.8, dt * 6) * (1 + Math.sin(now * 0.01) * 0.06);
+          jelly.glow = lerp(jelly.glow, 0.92, dt * 4);
+          jelly.color.r = lerp(jelly.color.r, 250, dt * 4);
+          jelly.color.g = lerp(jelly.color.g, 225, dt * 4);
+          jelly.color.b = lerp(jelly.color.b, 255, dt * 4);
+          if (t < 0.08) {
+            spawnColorBubbles(10 + ((Math.random() * 6) | 0), { x: jelly.pos.x, y: jelly.pos.y - jelly.baseR * 0.1 });
+            bgFlash = Math.min(1, bgFlash + 0.25);
+          }
+        } else if (state === State.FIST) {
+          const t = clamp01((now - stateT0) / 180);
+          jelly.scale = lerp(jelly.scale, 0.6, dt * 10);
+          jelly.glow = lerp(jelly.glow, 0.5, dt * 8);
+          jelly.color.r = lerp(jelly.color.r, 255, dt * 10);
+          jelly.color.g = lerp(jelly.color.g, 95, dt * 10);
+          jelly.color.b = lerp(jelly.color.b, 95, dt * 10);
+          jelly.shake = lerp(jelly.shake, 1, dt * 18);
+          if (t < 0.1 && Math.random() < 0.55) {
+            spawnInkDrops(3 + ((Math.random() * 2) | 0), { x: jelly.pos.x, y: jelly.pos.y + jelly.baseR * 0.25 });
+          }
+        } else if (state === State.FAST) {
+          // 120~140 bpm
+          const bpm = 132;
+          const freq = bpm / 60;
+          beatPhase += freq * dt * 2 * Math.PI;
+          const s = (Math.sin(beatPhase) + 1) / 2; // 0..1
+          const scaleTarget = 1 + s * 1.5; // 最大约 2.5
+          jelly.scale = lerp(jelly.scale, scaleTarget, dt * 14);
+          jelly.glow = lerp(jelly.glow, 0.98, dt * 8);
+
+          // 每次“放大”喷少量泡泡；每次“缩小”颜色更深红
+          const rising = s > 0.7 && lastBeatS <= 0.7;
+          const falling = s < 0.3 && lastBeatS >= 0.3;
+          if (rising) {
+            spawnColorBubbles(3 + ((Math.random() * 3) | 0), { x: jelly.pos.x, y: jelly.pos.y - jelly.baseR * 0.08 }, 90, 46);
+          }
+          if (falling) {
+            jelly.color.r = 255;
+            jelly.color.g = 70;
+            jelly.color.b = 90;
+          } else {
+            jelly.color.r = lerp(jelly.color.r, 245, dt * 6);
+            jelly.color.g = lerp(jelly.color.g, 160, dt * 6);
+            jelly.color.b = lerp(jelly.color.b, 210, dt * 6);
+          }
+          lastBeatS = s;
+        } else {
+          jelly.scale = lerp(jelly.scale, 1, dt * 2.2);
+          jelly.glow = lerp(jelly.glow, 0.75, dt * 1.8);
+          jelly.color.r = lerp(jelly.color.r, 240, dt * 1.5);
+          jelly.color.g = lerp(jelly.color.g, 215, dt * 1.5);
+          jelly.color.b = lerp(jelly.color.b, 255, dt * 1.5);
+        }
+
+        // 跟随速度越快，触手甩得越明显（用速度影响绘制）
+        const speed = Math.hypot(jelly.vel.x, jelly.vel.y);
+        const speedN = clamp01(speed / 800);
+
+        // 3~5 秒一次自动吐银白小泡泡（手在控制时）
+        if (handPresent && now - lastAutoBubble > 3000 + Math.random() * 2000) {
+          spawnSilverBubbles(2 + ((Math.random() * 2) | 0), { x: jelly.pos.x, y: jelly.pos.y + jelly.baseR * 0.25 });
+          lastAutoBubble = now;
+        }
+
+        // 无人控制 8~12 秒小动作：转圈 / 上浮 / 心形泡泡
+        if (!handPresent && now > nextIdleTrickAt) {
+          const pick = (Math.random() * 3) | 0;
+          if (pick === 0) {
+            // 轻轻吐心形泡泡
+            spawnHeartBubbles(8 + ((Math.random() * 4) | 0), { x: jelly.pos.x, y: jelly.pos.y });
+          } else if (pick === 1) {
+            // 上浮一下
+            jelly.vel.y -= 140;
+          } else {
+            // 转圈：用速度注入一点侧向，让它绕个小圈
+            jelly.vel.x += (Math.random() < 0.5 ? -1 : 1) * 160;
+            jelly.vel.y += (Math.random() < 0.5 ? -1 : 1) * 80;
+          }
+          nextIdleTrickAt = now + 8000 + Math.random() * 4000;
+        }
+
+        // 更新泡泡/墨滴
+        for (let i = bubbles.length - 1; i >= 0; i--) {
+          const b = bubbles[i];
+          b.vy -= 22 * dt;
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+          b.life -= dt;
+          if (b.life <= 0 || b.y < -80) {
+            // 偶尔爆开成泡泡雨
+            if (b.pop && b.kind === "bubble" && Math.random() < 0.6) {
+              spawnColorBubbles(4 + ((Math.random() * 3) | 0), { x: b.x, y: b.y }, 60, 30);
+            }
+            bubbles.splice(i, 1);
+          }
+        }
+        for (let i = inks.length - 1; i >= 0; i--) {
+          const d = inks[i];
+          d.vy += 240 * dt;
+          d.y += d.vy * dt;
+          d.x += d.vx * dt;
+          d.life -= dt;
+          if (d.life <= 0 || d.y > h + 60) inks.splice(i, 1);
+        }
+
+        // --- 渲染 ---
+        drawBackground(w, h, speedN);
+        drawJellyfish(w, h, now, speedN);
+        drawParticles();
+
+        requestAnimationFrame(tick);
+      }
+
+      function drawBackground(w, h, speedN) {
+        // 深海渐变底色
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, "#071b46");
+        g.addColorStop(0.48, "#05051b");
+        g.addColorStop(1, "#020012");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        // 月光感小提亮（张开手触发）
+        if (bgFlash > 0.001) {
+          ctx.fillStyle = `rgba(180, 220, 255, ${bgFlash * 0.16})`;
+          ctx.fillRect(0, 0, w, h);
+        }
+
+        // 心跳光晕（FAST）
+        if (state === State.FAST) {
+          const s = (Math.sin(beatPhase) + 1) / 2;
+          const intensity = s * 0.55;
+          const rad = Math.max(w, h) * 0.85;
+          const hg = ctx.createRadialGradient(jelly.pos.x, jelly.pos.y, 0, jelly.pos.x, jelly.pos.y, rad);
+          hg.addColorStop(0, `rgba(255, 120, 200, ${0.22 * intensity})`);
+          hg.addColorStop(0.5, `rgba(160, 80, 220, ${0.18 * intensity})`);
+          hg.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.fillStyle = hg;
+          ctx.fillRect(0, 0, w, h);
+        }
+
+        // 微光粒子（极淡绿）
+        for (const p of bgDots) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${p.hue}, 75%, 70%, ${p.a})`;
+          ctx.fill();
+        }
+
+        // 轻微暗角
+        const vg = ctx.createRadialGradient(w * 0.5, h * 0.4, Math.min(w, h) * 0.2, w * 0.5, h * 0.5, Math.max(w, h) * 0.7);
+        vg.addColorStop(0, "rgba(0,0,0,0)");
+        vg.addColorStop(1, "rgba(0,0,0,0.35)");
+        ctx.fillStyle = vg;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      function drawJellyfish(w, h, now, speedN) {
+        const cx = jelly.pos.x;
+        const cy = jelly.pos.y;
+        const r = jelly.baseR * jelly.scale;
+        const c = jelly.color;
+
+        // FIST 抖动（全身小幅颤动）
+        const shakeAmp = state === State.FIST ? 6 : 2;
+        const sx = (Math.random() - 0.5) * shakeAmp * jelly.shake;
+        const sy = (Math.random() - 0.5) * shakeAmp * jelly.shake;
+
+        ctx.save();
+        ctx.translate(cx + sx, cy + sy);
+
+        // 触手“甩动”方向：速度越快越明显
+        const tail = speedN * (state === State.FAST ? 1.8 : 1.0);
+
+        // 触手：FIST 缩紧，FAST 乱甩
+        const tentacles = 14;
+        const baseLen = r * 1.35 * (state === State.FAST ? 1.35 : 1);
+        const t = now * 0.002;
+        const wobble = state === State.FAST ? 1.9 : 1;
+
+        ctx.lineCap = "round";
+        for (let i = 0; i < tentacles; i++) {
+          const k = i / (tentacles - 1);
+          const ang0 = -Math.PI / 2 + (k - 0.5) * Math.PI * 0.95;
+          const sway = Math.sin(t * (1.4 + wobble) + i * 0.9) * (0.26 + 0.36 * tail) * wobble;
+          const ang = ang0 + sway - tail * 0.55;
+
+          let len = baseLen * (0.7 + k * 0.55);
+          if (state === State.FIST) len *= 0.32;
+          if (state === State.OPEN) len *= 1.08;
+
+          const thickness = 2.2 + k * 2.4;
+          const ex = Math.cos(ang) * len;
+          const ey = Math.sin(ang) * len + (20 + 30 * k);
+
+          const cp1x = Math.cos(ang0) * r * 0.25;
+          const cp1y = r * (0.55 + 0.15 * k);
+          const cp2x = ex * 0.5 + Math.sin(t + i) * (10 + 18 * tail) * wobble;
+          const cp2y = ey * 0.55;
+
+          const grad = ctx.createLinearGradient(0, -r * 0.2, 0, len);
+          if (state === State.FIST) {
+            grad.addColorStop(0, `rgba(255, 80, 80, 0.35)`);
+            grad.addColorStop(1, `rgba(40, 0, 10, 0.03)`);
+          } else {
+            grad.addColorStop(0, `rgba(${c.r}, ${c.g}, ${c.b}, 0.34)`);
+            grad.addColorStop(0.65, `rgba(${c.r - 50}, ${c.g - 60}, ${c.b}, 0.18)`);
+            grad.addColorStop(1, `rgba(20, 0, 35, 0.02)`);
+          }
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = thickness;
+
+          ctx.beginPath();
+          ctx.moveTo(0, r * 0.12);
+          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, ex, ey);
+          ctx.stroke();
+        }
+
+        // 水母主体：半透明胶质 + 发光
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        const glow = ctx.createRadialGradient(-r * 0.25, -r * 0.55, r * 0.2, 0, 0, r * 1.35);
+        if (state === State.FIST) {
+          glow.addColorStop(0, `rgba(255, 70, 70, ${0.35 * jelly.glow})`);
+          glow.addColorStop(0.6, `rgba(180, 20, 35, ${0.12 * jelly.glow})`);
+          glow.addColorStop(1, "rgba(0,0,0,0)");
+        } else {
+          glow.addColorStop(0, `rgba(${c.r}, ${c.g}, ${c.b}, ${0.35 * jelly.glow})`);
+          glow.addColorStop(0.55, `rgba(180, 140, 255, ${0.12 * jelly.glow})`);
+          glow.addColorStop(1, "rgba(0,0,0,0)");
+        }
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, r * 1.55, r * 1.35, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // 主体胶质
+        const core = ctx.createRadialGradient(-r * 0.25, -r * 0.55, r * 0.12, 0, 0, r * 1.08);
+        if (state === State.FIST) {
+          core.addColorStop(0, "rgba(255, 220, 220, 0.75)");
+          core.addColorStop(0.5, "rgba(255, 70, 70, 0.55)");
+          core.addColorStop(1, "rgba(80, 0, 15, 0.12)");
+        } else {
+          core.addColorStop(0, `rgba(255, 255, 255, 0.92)`);
+          core.addColorStop(0.45, `rgba(${c.r}, ${c.g}, ${c.b}, 0.72)`);
+          core.addColorStop(1, `rgba(${c.r - 40}, ${c.g - 50}, ${c.b - 10}, 0.10)`);
+        }
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, r * 1.05, r * 0.92, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 顶部帽沿（更圆润）
+        ctx.fillStyle = state === State.FIST ? "rgba(255, 120, 120, 0.22)" : "rgba(255,255,255,0.22)";
+        ctx.beginPath();
+        ctx.ellipse(0, -r * 0.12, r * 1.0, r * 0.8, 0, Math.PI, 0);
+        ctx.fill();
+
+        // 呆萌眼睛
+        const eyeY = -r * 0.05;
+        const eyeX = r * 0.28;
+        const eyeR = r * 0.085;
+        ctx.fillStyle = "rgba(10, 0, 20, 0.9)";
+        ctx.beginPath();
+        ctx.arc(-eyeX, eyeY, eyeR, 0, Math.PI * 2);
+        ctx.arc(eyeX, eyeY, eyeR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.beginPath();
+        ctx.arc(-eyeX - eyeR * 0.25, eyeY - eyeR * 0.25, eyeR * 0.35, 0, Math.PI * 2);
+        ctx.arc(eyeX - eyeR * 0.25, eyeY - eyeR * 0.25, eyeR * 0.35, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 嘴巴（轻微表情）
+        ctx.strokeStyle = state === State.FIST ? "rgba(40, 0, 10, 0.55)" : "rgba(30, 0, 40, 0.35)";
+        ctx.lineWidth = Math.max(2, r * 0.02);
+        ctx.beginPath();
+        ctx.arc(0, r * 0.08, r * 0.18, Math.PI * 0.05, Math.PI * 0.95);
+        ctx.stroke();
+
+        //（可选）小 emoji 贴纸感：不依赖图片
+        // 为避免不同系统 emoji 风格差异，这里不直接画 🪼，而是用矢量形状。
+
+        ctx.restore();
+      }
+
+      function drawParticles() {
+        // 泡泡
+        for (const b of bubbles) {
+          const a = clamp01(b.life / b.maxLife);
+          if (b.kind === "heart") {
+            drawHeart(b.x, b.y, b.r, b.color, 0.45 * a);
+            continue;
+          }
+          const rr = b.r;
+          const g = ctx.createRadialGradient(b.x - rr * 0.35, b.y - rr * 0.45, 0, b.x, b.y, rr * 1.8);
+          const base = b.kind === "silver" ? "rgba(230, 245, 255," : "rgba(255, 255, 255,";
+          g.addColorStop(0, `${base}${0.45 * a})`);
+          g.addColorStop(0.55, `${base}${0.22 * a})`);
+          g.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, rr * 1.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 彩色晕
+          if (b.kind === "bubble") {
+            ctx.strokeStyle = b.color.replace("0.9", `${0.35 * a}`);
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, rr * 1.05, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+
+        // 黑色颗粒（像墨汁）
+        for (const d of inks) {
+          const a = clamp01(d.life / d.maxLife);
+          ctx.fillStyle = `rgba(5, 0, 10, ${0.65 * a})`;
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawHeart(x, y, size, color, alpha) {
+        ctx.save();
+        ctx.translate(x, y);
+        const s = size * 0.045;
+        ctx.scale(s, s);
+        ctx.beginPath();
+        ctx.moveTo(0, 6);
+        ctx.bezierCurveTo(12, 24, 32, 26, 32, 8);
+        ctx.bezierCurveTo(32, -4, 18, -10, 0, -22);
+        ctx.bezierCurveTo(-18, -10, -32, -4, -32, 8);
+        ctx.bezierCurveTo(-32, 26, -12, 24, 0, 6);
+        ctx.fillStyle = color.replace("0.9", `${alpha}`);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 动画启动
+      requestAnimationFrame(tick);
+
+      // 初始化时把水母放正中
+      jelly.pos.x = canvas.width / 2;
+      jelly.pos.y = canvas.height / 2;
+      jelly.baseR = Math.min(canvas.width, canvas.height) * 0.11;
+
+      // 画面变化时刷新背景粒子密度
+      window.addEventListener(
+        "resize",
+        () => {
+          fit();
+          updateJellyBaseSize();
+          initBgDots();
+        },
+        { passive: true }
+      );
+    </script>
+  </body>
+</html>
