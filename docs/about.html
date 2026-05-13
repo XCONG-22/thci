@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-title-zh="关于 · 陈清扬" data-title-en="About · Cheryl Chen">关于 · 陈清扬</title>
+    <meta name="description" content="陈清扬 Cheryl Chen — 视觉传达设计、交互与多感官体验" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="lang-switch.css" />
+    <style>
+      :root {
+        --bg: #f5f5f5;
+        --bg-elevated: #fafafa;
+        --ink: #141312;
+        --about-body-font-size: 10.5pt;
+        --ink-muted: #5c5854;
+        --line: rgba(20, 19, 18, 0.1);
+        --hairline: rgba(20, 19, 18, 0.14);
+        --nav-h: 64px;
+        --accent: #c2410c;
+        --chip-bg: rgba(20, 19, 18, 0.04);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Noto Sans SC", "Instrument Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+      }
+
+      .skip-link:focus {
+        left: 16px;
+        top: 16px;
+        width: auto;
+        height: auto;
+        padding: 8px 14px;
+        background: var(--ink);
+        color: var(--bg);
+        border-radius: 8px;
+        z-index: 1000;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        height: var(--nav-h);
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 0 clamp(16px, 4vw, 40px);
+        background: color-mix(in srgb, var(--bg) 88%, transparent);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(20, 19, 18, 0.08);
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: auto;
+        flex-shrink: 0;
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .brand-mark {
+        font-family: "Instrument Sans", sans-serif;
+        font-weight: 600;
+        font-size: 1.05rem;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-sub {
+        font-size: 0.72rem;
+        color: var(--ink-muted);
+        font-weight: 500;
+      }
+
+      .header-link {
+        font-size: 0.82rem;
+        font-weight: 400;
+        color: var(--accent);
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        transition: background 0.2s, border-color 0.2s;
+      }
+
+      .header-link:hover {
+        background: var(--chip-bg);
+        border-color: var(--line);
+      }
+
+      .header-link:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .about-shell {
+        max-width: 1040px;
+        margin: 0 auto;
+        padding: clamp(28px, 5vw, 56px) clamp(16px, 4vw, 40px) clamp(48px, 8vw, 88px);
+        display: grid;
+        grid-template-columns: 1fr;
+        column-gap: clamp(32px, 5vw, 56px);
+        row-gap: 0;
+        align-items: start;
+      }
+
+      @media (min-width: 768px) {
+        .about-shell {
+          grid-template-columns: minmax(160px, 1fr) minmax(0, 3fr);
+        }
+
+        .about-kicker {
+          grid-column: 1 / -1;
+        }
+
+        .about-name {
+          position: sticky;
+          top: calc(var(--nav-h) + 24px);
+          padding-right: clamp(12px, 2vw, 24px);
+          border-right: 1px solid var(--line);
+          align-self: start;
+        }
+      }
+
+      .about-kicker {
+        margin: 0 0 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .about-name {
+        padding-bottom: 8px;
+      }
+
+      @media (max-width: 767px) {
+        .about-name {
+          padding-bottom: 20px;
+          border-bottom: 1px solid var(--line);
+        }
+      }
+
+      .name-cn {
+        margin: 0;
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        line-height: 1.2;
+      }
+
+      .name-en {
+        margin: 10px 0 0;
+        font-family: "Instrument Sans", sans-serif;
+        font-size: clamp(1rem, 2vw, 1.15rem);
+        font-weight: 500;
+        color: var(--ink-muted);
+        letter-spacing: 0.02em;
+      }
+
+      .name-en::before {
+        content: "（";
+      }
+
+      .name-en::after {
+        content: "）";
+      }
+
+      .about-body > p {
+        margin: 0 0 1.25em;
+        font-size: var(--about-body-font-size);
+        font-weight: 400;
+        color: var(--ink);
+        max-width: 68ch;
+        line-height: 1.5;
+      }
+
+      .about-body > p:last-of-type {
+        margin-bottom: 0;
+      }
+
+      .rule {
+        margin: clamp(14px, 2.5vw, 26px) 0;
+        border: none;
+        border-top: 1px solid var(--hairline);
+        height: 0;
+      }
+
+      .about-more {
+        margin-top: clamp(36px, 5vw, 52px);
+        padding-top: 0;
+        max-width: 58ch;
+      }
+
+      .meta-block {
+        padding: clamp(26px, 4vw, 44px) 0;
+      }
+
+      .meta-block h2 {
+        margin: 0 0 14px;
+        font-size: 13pt;
+        font-weight: 400;
+        letter-spacing: 0.1em;
+        text-transform: none;
+        color: var(--ink-muted);
+        font-family: "Noto Sans SC", "Instrument Sans", sans-serif;
+        line-height: 1.5;
+      }
+
+      .meta-block p,
+      .meta-block li {
+        margin: 0;
+        font-size: var(--about-body-font-size);
+        font-weight: 400;
+        color: var(--ink);
+        line-height: 1.5;
+      }
+
+      .meta-block ul {
+        margin: 0;
+        padding-left: 1.15em;
+      }
+
+      .meta-block li + li {
+        margin-top: 0.5em;
+      }
+
+      .edu-line {
+        margin: 0 0 0.85em;
+        font-size: var(--about-body-font-size);
+        font-weight: 400;
+        line-height: 1.5;
+      }
+
+      .edu-dates {
+        display: inline-block;
+        min-width: 9.5em;
+        color: var(--ink-muted);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.02em;
+      }
+
+      /* 必须高于 .meta-block p / .meta-block .skill-para，否则加粗与下边距被覆盖 */
+      .meta-block p.edu-line--emph,
+      .meta-block p.skill-para--emph,
+      .meta-block p.job-head--emph {
+        font-weight: 700;
+        margin-top: 0;
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 2.25em;
+      }
+
+      .meta-block p.edu-line--emph .edu-dates,
+      .meta-block p.job-head--emph .edu-dates {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .edu-line > span + span {
+        margin-left: 0.35em;
+      }
+
+      .job-head > span + span {
+        margin-left: 0.35em;
+      }
+
+      .meta-detail {
+        margin: 0;
+        padding-left: 1.15em;
+      }
+
+      .meta-detail > li {
+        margin-top: 0.55em;
+        line-height: 1.5;
+      }
+
+      .meta-detail > li:first-child {
+        margin-top: 0;
+      }
+
+      .job-head {
+        font-size: var(--about-body-font-size);
+        line-height: 1.5;
+      }
+
+      .job-head:not(.job-head--emph) {
+        margin: 0 0 0.85em;
+        font-weight: 400;
+      }
+
+      .meta-sub {
+        margin: 1.35em 0 0.4em;
+        font-size: var(--about-body-font-size);
+        font-weight: 400;
+        letter-spacing: 0.06em;
+        color: var(--ink);
+        line-height: 1.5;
+      }
+
+      .meta-sub:first-of-type {
+        margin-top: 0.5em;
+      }
+
+      .meta-block .skill-para:not(.skill-para--emph) {
+        margin: 0 0 0.35em;
+        font-size: var(--about-body-font-size);
+        font-weight: 400;
+        line-height: 1.5;
+        max-width: none;
+      }
+
+      .site-footer {
+        padding: 28px clamp(16px, 4vw, 40px) 40px;
+        border-top: 1px solid rgba(20, 19, 18, 0.08);
+        text-align: center;
+        font-size: var(--about-body-font-size);
+        color: var(--ink-muted);
+        line-height: 1.5;
+      }
+
+      .site-footer a {
+        color: var(--accent);
+        font-weight: 400;
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main"><span data-i18n-zh="跳到主要内容" data-i18n-en="Skip to main content">跳到主要内容</span></a>
+
+    <header class="site-header">
+      <a class="brand" href="portfolio.html" data-i18n-aria-zh="返回作品集" data-i18n-aria-en="Back to portfolio" aria-label="返回作品集">
+        <span class="brand-mark">Portfolio</span>
+        <span class="brand-sub">陈清扬</span>
+      </a>
+      <div class="header-right">
+        <a class="header-link" href="PORTFOLIO/" data-i18n-aria-zh="PORTFOLIO：thci 入口" data-i18n-aria-en="PORTFOLIO: thci hub" aria-label="PORTFOLIO：thci 入口">PORTFOLIO</a>
+        <a class="header-link" href="portfolio.html"
+          ><span data-i18n-zh="← 作品分区" data-i18n-en="← Works">← 作品分区</span></a
+        >
+        <div class="lang-switch" role="group" aria-label="语言 / Language">
+          <button type="button" data-set-lang="zh" class="is-active">中</button>
+          <button type="button" data-set-lang="en">EN</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="about-shell">
+      <p class="about-kicker"><span data-i18n-zh="简介" data-i18n-en="Profile">简介</span></p>
+
+      <div class="about-name">
+        <h1 class="name-cn">陈清扬</h1>
+        <p class="name-en">Cheryl Chen</p>
+      </div>
+
+      <div class="about-body">
+        <p
+          data-i18n-zh="视觉传达设计背景，关注将生物、视觉与技术之间的关系转化为具有感知性与叙事性的设计体验。工作涵盖 AI 生成、交互设计、生物材料可视化与多感官体验研究，曾应用于藻类生态、可持续设计、动态视觉与未来媒介等项目中。"
+          data-i18n-en="With a background in visual communication, I explore how biology, visual culture, and technology meet in sensory, narrative-led experiences. My work spans AI-driven design, interaction, biomaterial visualization, and multisensory research—applied to algae ecology, sustainable design, motion, and emerging media."
+        >
+          视觉传达设计背景，关注将生物、视觉与技术之间的关系转化为具有感知性与叙事性的设计体验。工作涵盖 AI 生成、交互设计、生物材料可视化与多感官体验研究，曾应用于藻类生态、可持续设计、动态视觉与未来媒介等项目中。
+        </p>
+        <p
+          data-i18n-zh="我关注视觉如何连接情绪、生态与技术系统，并尝试通过图像、数据与交互构建兼具实验性、逻辑性与审美感的设计语言，让设计不仅停留于观看，而成为一种能够被感知、参与与持续生长的媒介。"
+          data-i18n-en="I look at how visuals connect emotion, ecology, and technical systems—using image, data, and interaction to build a language that is experimental, logical, and aesthetic—so design is not only seen but felt, shared, and able to grow over time."
+        >
+          我关注视觉如何连接情绪、生态与技术系统，并尝试通过图像、数据与交互构建兼具实验性、逻辑性与审美感的设计语言，让设计不仅停留于观看，而成为一种能够被感知、参与与持续生长的媒介。
+        </p>
+
+        <div class="about-more">
+          <hr class="rule" aria-hidden="true" />
+
+          <section class="meta-block" id="education" aria-labelledby="education-h">
+            <h2 id="education-h"><span data-i18n-zh="教育背景" data-i18n-en="Education">教育背景</span></h2>
+            <p class="edu-line edu-line--emph">
+              <span class="edu-dates" data-i18n-zh="2021.09 — 2025.06" data-i18n-en="Sep 2021 — Jun 2025">2021.09 — 2025.06</span
+              ><span
+                data-i18n-zh="上海视觉艺术学院 · 视觉传达设计（本科）"
+                data-i18n-en=" · Shanghai Institute of Visual Arts · Visual Communication (BFA)"
+              >
+                上海视觉艺术学院 · 视觉传达设计（本科）</span
+              >
+            </p>
+            <p class="edu-line edu-line--emph">
+              <span class="edu-dates" data-i18n-zh="2025.09 — 至今" data-i18n-en="Sep 2025 — Present">2025.09 — 至今</span
+              ><span
+                data-i18n-zh="澳门大学 · 视觉传达设计（硕士）"
+                data-i18n-en=" · University of Macau · Visual Communication (MFA)"
+              >
+                澳门大学 · 视觉传达设计（硕士）</span
+              >
+            </p>
+            <ul class="meta-detail">
+              <li data-i18n-zh="GPA：3.49 / 4.0" data-i18n-en="GPA: 3.49 / 4.0">GPA：3.49 / 4.0</li>
+              <li
+                data-i18n-zh="主修课程：动态设计、书籍设计、海报设计、导视设计、UI 设计、跨专业设计研究、品牌形象设计、可视化生成设计、商业摄影等"
+                data-i18n-en="Key courses: motion, editorial, poster, wayfinding, UI, interdisciplinary study, branding, generative visualization, commercial photography, and more."
+              >
+                主修课程：动态设计、书籍设计、海报设计、导视设计、UI 设计、跨专业设计研究、品牌形象设计、可视化生成设计、商业摄影等
+              </li>
+              <li
+                data-i18n-zh="荣誉奖项：第六届日本概念艺术设计银奖、2024 AADC 北美应用艺术设计大赛银奖、「九贝杯」首届产业赋能包装创意设计优秀奖"
+                data-i18n-en="Awards: Silver, 6th Japan Conceptual Art & Design; Silver, 2024 AADC; Excellence, Jiubei Cup packaging for industry."
+              >
+                荣誉奖项：第六届日本概念艺术设计银奖、2024 AADC 北美应用艺术设计大赛银奖、「九贝杯」首届产业赋能包装创意设计优秀奖
+              </li>
+            </ul>
+          </section>
+
+          <hr class="rule" aria-hidden="true" />
+
+          <section class="meta-block" id="skills" aria-labelledby="skills-h">
+            <h2 id="skills-h"><span data-i18n-zh="技能" data-i18n-en="Skills">技能</span></h2>
+            <p class="meta-sub" data-i18n-zh="软件技能" data-i18n-en="Software">软件技能</p>
+            <p
+              class="skill-para skill-para--emph"
+              data-i18n-zh="精通 PS、AI、AE、ID、Figma、ProtoPie、剪映、P5.js、Office；熟练使用 AI 工具。"
+              data-i18n-en="Proficient in PS, AI, AE, ID, Figma, ProtoPie, CapCut, P5.js, Office; fluent with AI-assisted tools."
+            >
+              精通 PS、AI、AE、ID、Figma、ProtoPie、剪映、P5.js、Office；熟练使用 AI 工具。
+            </p>
+            <p class="meta-sub" data-i18n-zh="个人证书" data-i18n-en="Licenses">个人证书</p>
+            <p class="skill-para" data-i18n-zh="C1 驾驶证、证券从业资格证。" data-i18n-en="C1 driver license; securities qualification.">
+              C1 驾驶证、证券从业资格证。
+            </p>
+            <p class="meta-sub" data-i18n-zh="语言证书" data-i18n-en="Languages">语言证书</p>
+            <p
+              class="skill-para"
+              data-i18n-zh="英语 CET-4 证书（可适应全英文办公环境）、德语 B1 证书、普通话二级甲等，有日语、韩语基础。"
+              data-i18n-en="CET-4 English (comfortable in English office settings); German B1; Mandarin 2A; introductory Japanese and Korean."
+            >
+              英语 CET-4 证书（可适应全英文办公环境）、德语 B1 证书、普通话二级甲等，有日语、韩语基础。
+            </p>
+            <p class="meta-sub" data-i18n-zh="个人优势" data-i18n-en="Strengths">个人优势</p>
+            <ul class="meta-detail">
+              <li
+                data-i18n-zh="专业背景：视觉传达设计专业，拥有良好美学素养以及艺术鉴赏能力，较强的色彩感知能力与视觉表达能力，对画面质感有追求，擅于发挥想象力和创造力。"
+                data-i18n-en="Practice: visual communication training with strong aesthetics, color sensitivity, and expressive craft—focused on texture and imaginative ideation."
+              >
+                专业背景：视觉传达设计专业，拥有良好美学素养以及艺术鉴赏能力，较强的色彩感知能力与视觉表达能力，对画面质感有追求，擅于发挥想象力和创造力。
+              </li>
+              <li
+                data-i18n-zh="工作能力：丰富的设计素材资源，能根据设计要求快速上手应用，能在较短时间出图；有完整的工作计划及业务实施流程，能高效率完成工作任务。"
+                data-i18n-en="Delivery: broad visual libraries, quick ramp-up on briefs, fast iteration; clear plans and workflows for efficient execution."
+              >
+                工作能力：丰富的设计素材资源，能根据设计要求快速上手应用，能在较短时间出图；有完整的工作计划及业务实施流程，能高效率完成工作任务。
+              </li>
+              <li
+                data-i18n-zh="综合素质：工作认真细致，具备优秀的协调沟通、逻辑思维及学习思考能力，有非常强的工作原则性和责任感，具有高度的团队合作精神，善于自我激励和承受压力。"
+                data-i18n-en="Collaboration: detail-oriented, clear communication and logic, strong ownership, teamwork, and resilience under pressure."
+              >
+                综合素质：工作认真细致，具备优秀的协调沟通、逻辑思维及学习思考能力，有非常强的工作原则性和责任感，具有高度的团队合作精神，善于自我激励和承受压力。
+              </li>
+            </ul>
+          </section>
+
+          <hr class="rule" aria-hidden="true" />
+
+          <section class="meta-block" id="experience" aria-labelledby="experience-h">
+            <h2 id="experience-h"><span data-i18n-zh="实习经历" data-i18n-en="Internship">实习经历</span></h2>
+            <p class="job-head job-head--emph">
+              <span class="edu-dates" data-i18n-zh="2024.03 — 2024.09" data-i18n-en="Mar 2024 — Sep 2024">2024.03 — 2024.09</span
+              ><span
+                data-i18n-zh="上海正泰电器国际贸易有限公司 · 设计实习生"
+                data-i18n-en=" · Chint Global (Shanghai) · Design Intern"
+              >
+                上海正泰电器国际贸易有限公司 · 设计实习生</span
+              >
+            </p>
+            <ul class="meta-detail">
+              <li
+                data-i18n-zh="版面设计：负责新媒体部分（公司官方公众号）版面设计与制作，根据产品调性设计符合风格的物料，以提高浏览量为目的完成颜色搭配、排版布局、内容呈现等，不断优化品牌创意及视觉产出。"
+                data-i18n-en="Layout: WeChat layouts and campaign assets aligned with product tone—color, grid, and storytelling tuned for reach and brand consistency."
+              >
+                版面设计：负责新媒体部分（公司官方公众号）版面设计与制作，根据产品调性设计符合风格的物料，以提高浏览量为目的完成颜色搭配、排版布局、内容呈现等，不断优化品牌创意及视觉产出。
+              </li>
+              <li
+                data-i18n-zh="视觉设计：参与公司视觉形象的构建，涵盖宣传手册、海报、展板、公司周边物料设计，累计产出 20+ 件物料，把控设计成本及整体风格，跟进物料的设计更新及监督制作、实施情况。"
+                data-i18n-en="Visual identity: brochures, posters, panels, and swag—20+ deliverables with cost and style control through production."
+              >
+                视觉设计：参与公司视觉形象的构建，涵盖宣传手册、海报、展板、公司周边物料设计，累计产出 20+ 件物料，把控设计成本及整体风格，跟进物料的设计更新及监督制作、实施情况。
+              </li>
+              <li
+                data-i18n-zh="市场分析 &amp; 素材储备：时刻关注行业内最新设计动向，素材库储备 120+ 物料，根据素材统计分析用户喜好并总结行业规律，收集视觉效果及相关的基础数据，实时提出多项产品设计更新思路。"
+                data-i18n-en="Research &amp; library: tracked trends, built a 120+ asset library, distilled audience patterns, and proposed product refresh ideas."
+              >
+                市场分析 &amp; 素材储备：时刻关注行业内最新设计动向，素材库储备 120+ 物料，根据素材统计分析用户喜好并总结行业规律，收集视觉效果及相关的基础数据，实时提出多项产品设计更新思路。
+              </li>
+              <li
+                data-i18n-zh="设计跟进 &amp; 复盘：跟进设计项目中的各个重要节点，收集项目内的各项成果数据并定期复盘，对自身所做的设计方案进行深化和完善。"
+                data-i18n-en="Process: tracked milestones, gathered metrics, ran retrospectives, and refined proposals."
+              >
+                设计跟进 &amp; 复盘：跟进设计项目中的各个重要节点，收集项目内的各项成果数据并定期复盘，对自身所做的设计方案进行深化和完善。
+              </li>
+              <li
+                data-i18n-zh="物料采购支持：熟悉公司 SAP 采购相关流程并跟进物料采购全过程，参与物料供应商的管理与维护，协调采购团队对用量进行成本分析，总结各项指标从而进行耗量管控。"
+                data-i18n-en="Procurement: SAP workflows, vendor coordination, usage analytics, and consumption control."
+              >
+                物料采购支持：熟悉公司 SAP 采购相关流程并跟进物料采购全过程，参与物料供应商的管理与维护，协调采购团队对用量进行成本分析，总结各项指标从而进行耗量管控。
+              </li>
+              <li
+                data-i18n-zh="业务支持：协助调整美化对客宣讲 PPT 等业务资料以及部分视频剪辑工作；协助做好部门部分行政工作，包括合同 / 素材归档、资料整理、资产管理维护等。"
+                data-i18n-en="Ops support: polished client decks and light video edits; contracts, archives, and asset housekeeping."
+              >
+                业务支持：协助调整美化对客宣讲 PPT 等业务资料以及部分视频剪辑工作；协助做好部门部分行政工作，包括合同 / 素材归档、资料整理、资产管理维护等。
+              </li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p><a href="portfolio.html" data-i18n-zh="返回作品集主界面" data-i18n-en="Back to portfolio home">返回作品集主界面</a></p>
+    </footer>
+
+    <script src="lang-switch.js"></script>
+  </body>
+</html>

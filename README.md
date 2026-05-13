@@ -53,6 +53,16 @@ npm run dev
 - `presentation/`：演示文稿 HTML / 大纲（可单独下载浏览）
 - `interaction/`：课程 interaction 页面
 
+### 个人作品集（GitHub Pages）
+
+部署源为 **`/docs`** 时，可在浏览器直接打开（静态 HTML，与本地 `interaction/` 同步）：
+
+- **作品集主界面：** [https://xcong-22.github.io/thci/portfolio.html](https://xcong-22.github.io/thci/portfolio.html)
+- **PORTFOLIO（仓库与演示入口）：** [https://xcong-22.github.io/thci/PORTFOLIO/](https://xcong-22.github.io/thci/PORTFOLIO/)
+- **关于：** [https://xcong-22.github.io/thci/about.html](https://xcong-22.github.io/thci/about.html)
+
+首页 `docs/index.html` 仍为排版智能分析器带截图幻灯；作品集与各项目详情页与 `covers/`、`work-*` 等静态资源同目录发布。
+
 ### 橙色小鱼 · 手势互动（GitHub Pages）
 
 在 **Settings → Pages** 中已选择 **`/docs`** 作为发布源时，可在浏览器直接打开（需 HTTPS，并允许摄像头）：

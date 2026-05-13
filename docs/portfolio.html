@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title
+      data-title-zh="作品集 · 陈清扬"
+      data-title-en="Portfolio · Cheryl Chen"
+    >
+      作品集 · 陈清扬
+    </title>
+    <meta name="description" content="个人作品集 — 综合设计、UI/UX、AI 生成、书籍、导视、动态与摄影" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="lang-switch.css" />
+    <style>
+      :root {
+        --bg: #f5f5f5;
+        --bg-elevated: #fafafa;
+        --ink: #141312;
+        --ink-muted: #5c5854;
+        --line: rgba(20, 19, 18, 0.08);
+        --shadow: 0 18px 50px rgba(20, 19, 18, 0.08);
+        --nav-h: 64px;
+        --accent: #c2410c;
+        --chip-bg: rgba(20, 19, 18, 0.04);
+        --card-bg: #ffffff;
+        --serif: "Noto Serif SC", "Times New Roman", "Times", serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Noto Sans SC", "Instrument Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+      }
+
+      .skip-link:focus {
+        left: 16px;
+        top: 16px;
+        width: auto;
+        height: auto;
+        padding: 8px 14px;
+        background: var(--ink);
+        color: var(--bg);
+        border-radius: 8px;
+        z-index: 1000;
+      }
+
+      /* —— 顶栏 —— */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        height: var(--nav-h);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 clamp(16px, 4vw, 40px);
+        background: color-mix(in srgb, var(--bg) 88%, transparent);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex-shrink: 0;
+      }
+
+      .brand-mark {
+        font-family: "Instrument Sans", sans-serif;
+        font-weight: 600;
+        font-size: 1.05rem;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-sub {
+        font-size: 0.72rem;
+        color: var(--ink-muted);
+        font-weight: 500;
+      }
+
+      .header-nav {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .works-menu {
+        position: relative;
+      }
+
+      .works-menu__btn {
+        list-style: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 18px;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: var(--ink);
+        background: color-mix(in srgb, var(--bg-elevated) 92%, transparent);
+        border: 1px solid var(--line);
+        transition: background 0.2s, border-color 0.2s, color 0.2s;
+      }
+
+      .works-menu__btn::-webkit-details-marker {
+        display: none;
+      }
+
+      .works-menu[open] .works-menu__btn {
+        background: #fff;
+        border-color: rgba(20, 19, 18, 0.14);
+      }
+
+      .works-menu__btn:hover {
+        color: var(--accent);
+      }
+
+      .works-menu__panel {
+        position: absolute;
+        left: 0;
+        top: calc(100% + 8px);
+        min-width: 220px;
+        padding: 6px;
+        background: var(--card-bg);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        z-index: 80;
+      }
+
+      .works-menu__panel a {
+        display: block;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: var(--ink-muted);
+        text-decoration: none;
+      }
+
+      .works-menu__panel a:hover {
+        background: var(--chip-bg);
+        color: var(--ink);
+      }
+
+      .works-menu__panel a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      .header-end {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        margin-left: auto;
+      }
+
+      .nav-about,
+      .nav-portfolio {
+        flex: 0 0 auto;
+        padding: 8px 18px;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: var(--ink-muted);
+        border: 1px solid var(--line);
+        background: color-mix(in srgb, var(--bg-elevated) 92%, transparent);
+        transition: background 0.2s, color 0.2s, border-color 0.2s;
+        white-space: nowrap;
+      }
+
+      .nav-about:hover,
+      .nav-portfolio:hover {
+        background: var(--chip-bg);
+        color: var(--ink);
+        border-color: rgba(20, 19, 18, 0.1);
+      }
+
+      .nav-about:focus-visible,
+      .nav-portfolio:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      /* —— Hero —— */
+      .hero {
+        padding: clamp(32px, 6vw, 72px) clamp(16px, 4vw, 40px) clamp(24px, 4vw, 48px);
+        max-width: 1120px;
+        margin: 0 auto;
+      }
+
+      .hero-kicker {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 12px;
+      }
+
+      .hero h1 {
+        margin: 0 0 16px;
+        font-size: clamp(1.85rem, 4.2vw, 2.75rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+
+      .hero-lead {
+        margin: 0;
+        max-width: 52ch;
+        font-size: 1.02rem;
+        color: var(--ink-muted);
+      }
+
+      /* —— 作品卡片：上图下文（简洁分区，参考画廊式排版） —— */
+      .sectors {
+        padding: 0 clamp(16px, 4vw, 40px) clamp(56px, 9vw, 100px);
+        max-width: 1080px;
+        margin: 0 auto;
+      }
+
+      .sectors-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: clamp(24px, 4vw, 36px);
+      }
+
+      @media (min-width: 720px) {
+        .sectors-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      .work-card {
+        background: var(--card-bg);
+        border: 1px solid var(--line);
+        overflow: hidden;
+        transition: box-shadow 0.28s ease;
+      }
+
+      .work-card:hover {
+        box-shadow: var(--shadow);
+      }
+
+      .work-card__link {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 100%;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .work-card__media {
+        position: relative;
+        aspect-ratio: 4 / 3;
+        background: linear-gradient(160deg, #e8e8e8 0%, #f4f4f4 42%, #dcdcdc 100%);
+      }
+
+      .work-card__media::after {
+        content: "IMG";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Instrument Sans", sans-serif;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.4em;
+        color: rgba(20, 19, 18, 0.16);
+        pointer-events: none;
+      }
+
+      .work-card__media img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .work-card__media:has(img)::after {
+        display: none;
+      }
+
+      .work-card__media--tbd {
+        background: linear-gradient(145deg, #ece8f4 0%, #f2f0f7 45%, #e2dce8 100%);
+      }
+
+      .work-card__media--tbd::after {
+        content: "···";
+        letter-spacing: 0.35em;
+        font-size: 0.72rem;
+        color: rgba(20, 19, 18, 0.22);
+      }
+
+      .work-card__body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: clamp(22px, 4vw, 32px) clamp(18px, 3vw, 28px) clamp(18px, 3vw, 24px);
+      }
+
+      .work-card__title {
+        margin: 0 0 8px;
+        font-family: var(--serif);
+        font-size: clamp(1.28rem, 2.4vw, 1.62rem);
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        line-height: 1.25;
+        color: var(--ink);
+      }
+
+      /* 分区下的具体作品名（小字）；无此元素时由 .work-card__tagline 紧跟主标题 */
+      .work-card__project {
+        margin: 0 0 12px;
+        max-width: 36ch;
+        font-family: var(--serif);
+        font-size: 0.94rem;
+        font-style: italic;
+        font-weight: 500;
+        line-height: 1.5;
+        color: #6a655f;
+      }
+
+      .work-card__tagline {
+        margin: 0 0 22px;
+        max-width: 36ch;
+        font-family: var(--serif);
+        font-size: 0.9rem;
+        font-style: italic;
+        font-weight: 400;
+        line-height: 1.55;
+        color: #6a655f;
+      }
+
+      .work-card__meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 10px 20px;
+        width: 100%;
+        font-family: var(--serif);
+        font-size: 0.8rem;
+        color: #7a736c;
+      }
+
+      .work-card__pill {
+        display: inline-block;
+        padding: 5px 12px;
+        border: 1px solid rgba(20, 19, 18, 0.12);
+        border-radius: 2px;
+        background: #f4f4f3;
+        font-style: italic;
+        font-size: 0.76rem;
+        color: #5c5854;
+      }
+
+      .work-card__year {
+        font-style: normal;
+        letter-spacing: 0.06em;
+        color: var(--ink);
+      }
+
+      .work-card__loc {
+        font-style: italic;
+        color: #8a837b;
+      }
+
+      .work-card__rule {
+        width: min(220px, 70%);
+        height: 1px;
+        margin-top: 20px;
+        background: rgba(20, 19, 18, 0.1);
+      }
+
+      .site-footer {
+        padding: 32px clamp(16px, 4vw, 40px) 48px;
+        border-top: 1px solid var(--line);
+        text-align: center;
+        font-size: 0.8rem;
+        color: var(--ink-muted);
+      }
+
+      .site-footer a {
+        color: var(--accent);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main"><span data-i18n-zh="跳到主要内容" data-i18n-en="Skip to main content">跳到主要内容</span></a>
+
+    <header class="site-header">
+      <a
+        class="brand"
+        href="#top"
+        data-i18n-aria-zh="返回顶部"
+        data-i18n-aria-en="Back to top"
+        aria-label="返回顶部"
+      >
+        <span class="brand-mark">Portfolio</span>
+        <span class="brand-sub"
+          ><span data-i18n-zh="作品集主界面" data-i18n-en="Home">作品集主界面</span></span
+        >
+      </a>
+      <nav class="header-nav" aria-label="主导航">
+        <details class="works-menu" id="works-menu">
+          <summary class="works-menu__btn">
+            <span data-i18n-zh="作品" data-i18n-en="Works">作品</span>
+          </summary>
+          <div class="works-menu__panel">
+            <a href="#integrated"><span data-i18n-zh="综合设计" data-i18n-en="Integrated">综合设计</span></a>
+            <a href="#uiux-jinsha"
+              ><span data-i18n-zh="UI/UX · 金沙旅享APP" data-i18n-en="UI/UX · Sands app">UI/UX · 金沙旅享APP</span></a
+            >
+            <a href="#uiux-yaodiantong"
+              ><span data-i18n-zh="UI/UX · 药点通" data-i18n-en="UI/UX · Yao Dian Tong">UI/UX · 药点通</span></a
+            >
+            <a href="#ai-gen"><span data-i18n-zh="AI 生成" data-i18n-en="AI">AI 生成</span></a>
+            <a href="#book"><span data-i18n-zh="书籍" data-i18n-en="Books">书籍</span></a>
+            <a href="#signage"><span data-i18n-zh="导视" data-i18n-en="Wayfinding">导视</span></a>
+            <a href="#motion"><span data-i18n-zh="动态" data-i18n-en="Motion">动态</span></a>
+            <a href="#photo"><span data-i18n-zh="摄影" data-i18n-en="Photography">摄影</span></a>
+          </div>
+        </details>
+        <a
+          class="nav-portfolio"
+          href="PORTFOLIO/"
+          data-i18n-aria-zh="PORTFOLIO：thci 仓库与在线演示入口"
+          data-i18n-aria-en="PORTFOLIO: thci repo and live demos"
+          aria-label="PORTFOLIO：thci 仓库与在线演示入口"
+          >PORTFOLIO</a
+        >
+        <a class="nav-about" href="about.html"><span data-i18n-zh="关于" data-i18n-en="About">关于</span></a>
+      </nav>
+      <div class="header-end">
+        <div class="lang-switch" role="group" aria-label="语言 / Language">
+          <button type="button" data-set-lang="zh" class="is-active">中</button>
+          <button type="button" data-set-lang="en">EN</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="top"></div>
+
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="hero-kicker">
+        <span data-i18n-zh="精选作品" data-i18n-en="Works">精选作品</span>
+      </p>
+      <h1 id="hero-title">
+        <span data-i18n-zh="跨类型的视觉与体验设计" data-i18n-en="Visual and experience design across disciplines"
+          >跨类型的视觉与体验设计</span
+        >
+      </h1>
+      <p class="hero-lead">
+        <span
+          data-i18n-zh="近年创作的部分节选，涵盖综合设计、数字界面、AI 影像、书籍与导视、动态影像与静物摄影。"
+          data-i18n-en="A selection of recent work in integrated design, UI, AI imagery, editorial, wayfinding, motion, and still life."
+          >近年创作的部分节选，涵盖综合设计、数字界面、AI 影像、书籍与导视、动态影像与静物摄影。</span
+        >
+      </p>
+    </section>
+
+    <main id="main" class="sectors">
+      <div class="sectors-grid">
+        <article id="integrated" class="work-card">
+          <a
+            class="work-card__link"
+            href="project-shizao.html"
+            data-i18n-aria-zh="综合设计：时藻（ALgae），查看项目详情"
+            data-i18n-aria-en="Integrated: ALgae — open project"
+            aria-label="综合设计：时藻（ALgae），查看项目详情"
+          >
+            <div class="work-card__media">
+              <img
+                src="covers/algae-cover.png"
+                alt="时藻（ALgae）项目封面"
+                data-i18n-alt-zh="时藻（ALgae）项目封面"
+                data-i18n-alt-en="ALgae project cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="work-card__body">
+              <h2 class="work-card__title">
+                <span data-i18n-zh="综合设计" data-i18n-en="Integrated">综合设计</span>
+              </h2>
+              <p class="work-card__project">
+                <span data-i18n-zh="时藻（ALgae）" data-i18n-en="ALgae">时藻（ALgae）</span>
+              </p>
+              <p class="work-card__tagline">
+                <span
+                  data-i18n-zh="以可持续发展为导向的藻类可视化综合设计"
+                  data-i18n-en="Sustainability-oriented integrated design for algae visualization"
+                  >以可持续发展为导向的藻类可视化综合设计</span
+                >
+              </p>
+              <div class="work-card__meta">
+                <span class="work-card__year">—</span>
+                <span class="work-card__loc"
+                  ><span data-i18n-zh="科学 × 视觉" data-i18n-en="Science × Visual">科学 × 视觉</span></span
+                >
+              </div>
+              <div class="work-card__rule" aria-hidden="true"></div>
+            </div>
+          </a>
+        </article>
+
+        <article id="uiux-jinsha" class="work-card">
+          <a
+            class="work-card__link"
+            href="project-jinsha-app.html"
+            data-i18n-aria-zh="UI/UX：澳门金沙合作 · 金沙旅享APP，查看项目详情"
+            data-i18n-aria-en="UI/UX: Sands Macao app — open project"
+            aria-label="UI/UX：澳门金沙合作 · 金沙旅享APP，查看项目详情"
+          >
+            <div class="work-card__media">
+              <img
+                src="covers/jinsha-travel-app-cover.png"
+                alt="金沙旅享APP升级界面项目封面"
+                data-i18n-alt-zh="金沙旅享APP升级界面项目封面"
+                data-i18n-alt-en="Sands Lifestyle app interface upgrade cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="work-card__body">
+              <h2 class="work-card__title">
+                <span data-i18n-zh="UI/UX 设计" data-i18n-en="UI/UX">UI/UX 设计</span>
+              </h2>
+              <p class="work-card__project">
+                <span
+                  data-i18n-zh="澳门金沙合作 · 金沙旅享APP功能升级"
+                  data-i18n-en="Sands Macao · Sands Lifestyle APP upgrade"
+                  >澳门金沙合作 · 金沙旅享APP功能升级</span
+                >
+              </p>
+              <p class="work-card__tagline">
+                <span
+                  data-i18n-zh="总结海报开篇 · Persona · 交互品质与流程 · 故事板与视频"
+                  data-i18n-en="Summary poster · Persona · Qualities & flow · Storyboard & video"
+                  >总结海报开篇 · Persona · 交互品质与流程 · 故事板与视频</span
+                >
+              </p>
+              <div class="work-card__meta">
+                <span class="work-card__year">—</span>
+                <span class="work-card__loc"
+                  ><span data-i18n-zh="校企项目 · 移动端" data-i18n-en="Academic partner · Mobile">校企项目 · 移动端</span></span
+                >
+              </div>
+              <div class="work-card__rule" aria-hidden="true"></div>
+            </div>
+          </a>
+        </article>
+
+        <article id="uiux-yaodiantong" class="work-card">
+          <a
+            class="work-card__link"
+            href="project-yaodiantong.html"
+            data-i18n-aria-zh="UI/UX：药点通服药管理应用，查看项目详情"
+            data-i18n-aria-en="UI/UX: Yao Dian Tong — open project"
+            aria-label="UI/UX：药点通服药管理应用，查看项目详情"
+          >
+            <div class="work-card__media">
+              <img
+                src="covers/yaodiantong-cover.png"
+                alt="药点通项目封面"
+                data-i18n-alt-zh="药点通项目封面"
+                data-i18n-alt-en="Yao Dian Tong project cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="work-card__body">
+              <h2 class="work-card__title">
+                <span data-i18n-zh="UI/UX 设计" data-i18n-en="UI/UX">UI/UX 设计</span>
+              </h2>
+              <p class="work-card__project">
+                <span data-i18n-zh="药点通" data-i18n-en="Yao Dian Tong">药点通</span>
+              </p>
+              <p class="work-card__tagline">
+                <span
+                  data-i18n-zh="服药计划 · 智能药箱联动 · 页面展示置尾"
+                  data-i18n-en="Med schedules · Smart box · UI screens last"
+                  >服药计划 · 智能药箱联动 · 页面展示置尾</span
+                >
+              </p>
+              <div class="work-card__meta">
+                <span class="work-card__year">—</span>
+                <span class="work-card__loc"
+                  ><span data-i18n-zh="移动端 · 医疗健康" data-i18n-en="Mobile · Health">移动端 · 医疗健康</span></span
+                >
+              </div>
+              <div class="work-card__rule" aria-hidden="true"></div>
+            </div>
+          </a>
+        </article>
+
+        <article id="ai-gen" class="work-card">
+          <a
+            class="work-card__link"
+            href="project-ai-gen.html"
+            data-i18n-aria-zh="AI 生成设计：梦屿、排版智能分析器与 STYLE NEW STYLE，查看详情页"
+            data-i18n-aria-en="AI design: Sleep Island, layout analyzer &amp; STYLE NEW STYLE — open detail"
+            aria-label="AI 生成设计：梦屿、排版智能分析器与 STYLE NEW STYLE，查看详情页"
+          >
+            <div class="work-card__media">
+              <img
+                src="covers/mengyu-cover.png"
+                alt="梦屿项目封面"
+                data-i18n-alt-zh="梦屿项目封面"
+                data-i18n-alt-en="Sleep Island project cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="work-card__body">
+              <h2 class="work-card__title">
+                <span data-i18n-zh="AI 生成设计" data-i18n-en="AI design">AI 生成设计</span>
+              </h2>
+              <p class="work-card__project">
+                <span data-i18n-zh="梦屿 · 排版 · STYLE NEW STYLE" data-i18n-en="Sleep Island · Type tool · SNS">梦屿 · 排版 · STYLE NEW STYLE</span>
+              </p>
+              <p class="work-card__tagline">
+                <span
+                  data-i18n-zh="睡眠叙事 · 版式分析器 · 风格迁移与文创"
+                  data-i18n-en="Sleep story · Layout analyzer · Style &amp; products"
+                  >睡眠叙事 · 版式分析器 · 风格迁移与文创</span
+                >
+              </p>
+              <div class="work-card__meta">
+                <span class="work-card__year">—</span>
+                <span class="work-card__loc"
+                  ><span data-i18n-zh="场景合成 · 字标" data-i18n-en="Scene comp · Type">场景合成 · 字标</span></span
+                >
+              </div>
+              <div class="work-card__rule" aria-hidden="true"></div>
+            </div>
+          </a>
+        </article>
+
+        <article id="book" class="work-card">
+          <a
+            class="work-card__link"
+            href="project-mushroom-book.html"
+            data-i18n-aria-zh="书籍设计：蘑菇中毒？倒带！，查看项目详情"
+            data-i18n-aria-en="Editorial: Mushroom poisoning? Rewind! — open project"
+            aria-label="书籍设计：蘑菇中毒？倒带！，查看项目详情"
+          >
+            <div class="work-card__media">
+              <img
+                src="covers/mushroom-book-cover.png"
+                alt="《蘑菇中毒？倒带！》项目封面"
+                data-i18n-alt-zh="《蘑菇中毒？倒带！》项目封面"
+                data-i18n-alt-en="Mushroom poisoning? Rewind! project cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="work-card__body">
+              <h2 class="work-card__title">
+                <span data-i18n-zh="书籍设计" data-i18n-en="Books">书籍设计</span>
+              </h2>
+              <p class="work-card__project">
+                <span data-i18n-zh="蘑菇中毒？倒带！" data-i18n-en="Mushroom poisoning? Rewind!">蘑菇中毒？倒带！</span>
+              </p>
+              <p class="work-card__tagline">
+                <span
+                  data-i18n-zh="在自然界的美与险之间识别真相"
+                  data-i18n-en="Identify the truth between the beauty and danger of nature"
+                  >在自然界的美与险之间识别真相</span
+                >
+              </p>
+              <div class="work-card__meta">
+                <span class="work-card__year">—</span>
+                <span class="work-card__loc"
+                  ><span data-i18n-zh="76p · 精装镂空" data-i18n-en="76pp · die-cut hardcover">76p · 精装镂空</span></span
+                >
+              </div>
+              <div class="work-card__rule" aria-hidden="true"></div>
+            </div>
+          </a>
+        </article>
+
+        <article id="signage" class="work-card">
+          <a
+            class="work-card__link"
+            href="project-stray-birds.html"
+            data-i18n-aria-zh="导视设计：飞鸟集，查看项目详情"
+            data-i18n-aria-en="Wayfinding: Stray Birds — open project"
+            aria-label="导视设计：飞鸟集，查看项目详情"
+          >
+            <div class="work-card__media">
+              <img
+                src="covers/stray-birds-signage-cover.png"
+                alt="飞鸟集导视系统项目封面"
+                data-i18n-alt-zh="飞鸟集导视系统项目封面"
+                data-i18n-alt-en="Stray Birds signage system cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="work-card__body">
+              <h2 class="work-card__title">
+                <span data-i18n-zh="导视设计" data-i18n-en="Wayfinding">导视设计</span>
+              </h2>
+              <p class="work-card__project">
+                <span data-i18n-zh="飞鸟集" data-i18n-en="Stray Birds">飞鸟集</span>
+              </p>
+              <p class="work-card__tagline">
+                <span
+                  data-i18n-zh="公益艺术展 · 传统意象 · 展线与人鸟叙事"
+                  data-i18n-en="Charity art show · Cultural motifs · Path and human–bird narrative"
+                  >公益艺术展 · 传统意象 · 展线与人鸟叙事</span
+                >
+              </p>
+              <div class="work-card__meta">
+                <span class="work-card__year">—</span>
+                <span class="work-card__loc"
+                  ><span data-i18n-zh="展线地图 · 图标系统" data-i18n-en="Floor plan · Icon system">展线地图 · 图标系统</span></span
+                >
+              </div>
+              <div class="work-card__rule" aria-hidden="true"></div>
+            </div>
+          </a>
+        </article>
+
+        <article id="motion" class="work-card">
+          <a
+            class="work-card__link"
+            href="project-gaze.html"
+            data-i18n-aria-zh="动态设计：GAZE，查看项目详情"
+            data-i18n-aria-en="Motion: GAZE — open project"
+            aria-label="动态设计：GAZE，查看项目详情"
+          >
+            <div class="work-card__media">
+              <img
+                src="covers/gaze-motion-cover.png"
+                alt="GAZE 动态设计项目封面"
+                data-i18n-alt-zh="GAZE 动态设计项目封面"
+                data-i18n-alt-en="GAZE motion design cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="work-card__body">
+              <h2 class="work-card__title">
+                <span data-i18n-zh="动态设计" data-i18n-en="Motion">动态设计</span>
+              </h2>
+              <p class="work-card__project">
+                <span data-i18n-zh="GAZE" data-i18n-en="GAZE">GAZE</span>
+              </p>
+              <p class="work-card__tagline">
+                <span
+                  data-i18n-zh="城市寓言 · 网络病毒意象 · 动态短片叙事"
+                  data-i18n-en="Urban fable · Network-virus motif · Motion narrative"
+                  >城市寓言 · 网络病毒意象 · 动态短片叙事</span
+                >
+              </p>
+              <div class="work-card__meta">
+                <span class="work-card__year">—</span>
+                <span class="work-card__loc"
+                  ><span data-i18n-zh="动态视频 · 主视觉" data-i18n-en="Motion film · Key visual">动态视频 · 主视觉</span></span
+                >
+              </div>
+              <div class="work-card__rule" aria-hidden="true"></div>
+            </div>
+          </a>
+        </article>
+
+        <article id="photo" class="work-card">
+          <a
+            class="work-card__link"
+            href="project-photo-egg.html"
+            data-i18n-aria-zh="摄影作品：卵，查看项目详情"
+            data-i18n-aria-en="Photography: Egg — open project"
+            aria-label="摄影作品：卵，查看项目详情"
+          >
+            <div class="work-card__media">
+              <img
+                src="covers/egg-still-cover.png"
+                alt="卵 — 静物摄影作品"
+                data-i18n-alt-zh="卵 — 静物摄影作品"
+                data-i18n-alt-en="Egg — still life photograph"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="work-card__body">
+              <h2 class="work-card__title">
+                <span data-i18n-zh="摄影作品" data-i18n-en="Photography">摄影作品</span>
+              </h2>
+              <p class="work-card__project">
+                <span data-i18n-zh="卵" data-i18n-en="Egg">卵</span>
+              </p>
+              <p class="work-card__tagline">
+                <span
+                  data-i18n-zh="双色光 · 静物 · 概念影调"
+                  data-i18n-en="Dual gel color · Still life · Conceptual tone"
+                  >双色光 · 静物 · 概念影调</span
+                >
+              </p>
+              <div class="work-card__meta">
+                <span class="work-card__year">—</span>
+                <span class="work-card__loc"
+                  ><span data-i18n-zh="影棚 · 单主体" data-i18n-en="Studio · Single subject">影棚 · 单主体</span></span
+                >
+              </div>
+              <div class="work-card__rule" aria-hidden="true"></div>
+            </div>
+          </a>
+        </article>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        <span
+          data-i18n-zh="本地预览：在浏览器中打开本文件。"
+          data-i18n-en="Local preview: open this file in your browser."
+          >本地预览：在浏览器中打开本文件。</span
+        >
+        <a href="about.html"><span data-i18n-zh="关于我" data-i18n-en="About">关于我</span></a>
+      </p>
+    </footer>
+
+    <script>
+      (function () {
+        var d = document.getElementById("works-menu");
+        if (!d) return;
+        d.querySelectorAll('.works-menu__panel a[href^="#"]').forEach(function (a) {
+          a.addEventListener("click", function () {
+            d.removeAttribute("open");
+          });
+        });
+      })();
+    </script>
+    <script src="lang-switch.js"></script>
+  </body>
+</html>
